@@ -6,21 +6,18 @@ public class MapDisplay : MonoBehaviour
 {
     public Renderer textureRender;
 
+    public MeshFilter meshFilter;
+    public MeshRenderer meshRednerer;
+
     public void DrawTexture(Texture2D texture)
     {
         textureRender.sharedMaterial.mainTexture = texture;
         textureRender.transform.localScale = new Vector3(texture.width, 1, texture.height);
     }
 
-    // Start is called before the first frame update
-    void Start()
+    public void DrawMesh(MeshData meshData, Texture2D texture)
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        meshFilter.sharedMesh = meshData.CreateMesh();
+        meshRednerer.sharedMaterial.mainTexture = texture;
     }
 }
