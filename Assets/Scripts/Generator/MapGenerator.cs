@@ -44,6 +44,7 @@ public class MapGenerator : MonoBehaviour
 
     // 240 is divisible by a lot more factors than the unity limit for chunk size (255)
     public const int mapChunkSize = 241;
+    public float terrainScale = 1f;
 
     [Range(0, 6)]
     public int editorLevelOfDetail;
@@ -51,8 +52,15 @@ public class MapGenerator : MonoBehaviour
 
     [Header("Noise Parameters")]
     // ML STUFF: These Values will be modified by the ML agent to create different terrain maps
-    // The ML agent will define which terrain is better based on % that is navigable, sloping, etc
+    // Generate Multiple Terrain Chunks after setting noiseNormalized to GLOBAL
+    // The ML agent will define which terrain is better based on % that is navigable, sloping, less percentage of areas accessible, etc
+    // This can be done by just the "noiseEstimatorVariable" or changing all the NoiseMap parameters as well
+    // Make sure there aren't too many plateaus or cut offs
+    // Will ensure generated areas are better for navigation and also to showcase all regions
+    public Noise.NormalizeMode noiseNormalized;
+    public float noiseEstimatorVariable;
     public float noiseScale;
+
     [Min(0)]
     public int octaves;
     [Range(0, 1)]
@@ -66,7 +74,9 @@ public class MapGenerator : MonoBehaviour
     public float heightMultiplier;
     public AnimationCurve heightCurve;
 
-    //  ML STUFF: This can be randomized by the ML agent when generating types of terrain, plains, deserts, mountains, etc 
+    //  ML STUFF: This can be randomized by the ML agent when generating types of forests, plains, deserts, mountains, islands, plateaus etc
+    // Could be based on the noise parameters or certain limits can be assigned to noise parameters based on the kind of reion to generate
+    // This can also be used to make sure all the regions appear in the generations(make sure mountains have snowy peaks for example)
     public TerrainType[] regions;
 
     MapDisplay mapDisplay;
@@ -194,7 +204,7 @@ public class MapGenerator : MonoBehaviour
     MapData GenerateMapData(Vector2 center)
     {
         // Generate Initial Noisemap
-        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, noiseScale, octaves, persistence, lacunarity, seed, center + offset);
+        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, noiseScale, octaves, persistence, lacunarity, seed, center + offset, noiseNormalized, noiseEstimatorVariable);
 
         // Create Color map
         Color[] colorMap = new Color[mapChunkSize * mapChunkSize]; 
@@ -205,9 +215,11 @@ public class MapGenerator : MonoBehaviour
                 float currentHeight = noiseMap[x, y];
                 for(int i = 0; i < regions.Length; i++)
                 {
-                    if(currentHeight <= regions[i].height)
+                    if(currentHeight >= regions[i].height)
                     {
                         colorMap[y * mapChunkSize + x] = regions[i].color;
+                    } else
+                    {
                         break;
                     }
                 }

@@ -11,6 +11,8 @@ public class EndlessTerrain : MonoBehaviour
         public float visibleDstThreshold;
     }
 
+
+    static float terrainScale;
     const float viewerThresholdToUpdate = 25f;
     // square distances are easier to calculate
     const float sqrViewerThresholdToUpdate = viewerThresholdToUpdate * viewerThresholdToUpdate;
@@ -18,9 +20,7 @@ public class EndlessTerrain : MonoBehaviour
     public static MapGenerator mapGen;
 
     public LODInfo[] detailLevels;
-
     public static float maxViewDst;
-
     public Transform viewer;
     public Material mapMaterial;
 
@@ -30,7 +30,7 @@ public class EndlessTerrain : MonoBehaviour
     int chunksVisibleInViewDst;
 
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
-    List<TerrainChunk> terrainChunksVisibleLastUpdate = new List<TerrainChunk>();
+    static List<TerrainChunk> terrainChunksVisibleLastUpdate = new List<TerrainChunk>();
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +40,7 @@ public class EndlessTerrain : MonoBehaviour
 
         // Set map Generator
         mapGen = FindObjectOfType<MapGenerator>();
+        terrainScale = mapGen.terrainScale;
 
         // Size of vertices in chunks is actually 1 less than this number
         chunkSize = MapGenerator.mapChunkSize - 1;
@@ -52,7 +53,7 @@ public class EndlessTerrain : MonoBehaviour
 
     void Update()
     {
-        viewerPosition = new Vector2(viewer.position.x, viewer.position.z);
+        viewerPosition = new Vector2(viewer.position.x, viewer.position.z) / terrainScale;
 
         if((lastUpdateViewerPosition - viewerPosition).sqrMagnitude > sqrViewerThresholdToUpdate)
         {
@@ -85,10 +86,6 @@ public class EndlessTerrain : MonoBehaviour
                 {
                     // Update chunk
                     terrainChunkDictionary[viewedChunkCoord].UpdateTerrainChunk();
-                    if(terrainChunkDictionary[viewedChunkCoord].IsVisible())
-                    {
-                        terrainChunksVisibleLastUpdate.Add(terrainChunkDictionary[viewedChunkCoord]);
-                    }
                 } else
                 {
                     // Add new terrain chunk and parent it to this transform
@@ -120,9 +117,9 @@ public class EndlessTerrain : MonoBehaviour
             this.detailLevels = detailLevels;
 
             position = coord * size;
+            Vector3 chunkPosition = new Vector3(position.x, 0, position.y);
             bounds = new Bounds(position, Vector2.one * size);
 
-            Vector3 positionV3 = new Vector3(position.x, 0, position.y);
 
             // Create plane
             meshObject = new GameObject("TerrainChunk_" + coord.x + ":" + coord.y);
@@ -130,7 +127,8 @@ public class EndlessTerrain : MonoBehaviour
             meshRenderer = meshObject.AddComponent<MeshRenderer>();
 
             meshObject.transform.parent = parent;
-            meshObject.transform.position = positionV3;
+            meshObject.transform.position = chunkPosition * terrainScale;
+            meshObject.transform.localScale = Vector3.one * terrainScale;
             SetVisible(false);
 
             // Create LOD meshes for all levels of detail
@@ -200,6 +198,8 @@ public class EndlessTerrain : MonoBehaviour
                         lodMesh.RequestMesh(mapData);
                     }
                 }
+
+                terrainChunksVisibleLastUpdate.Add(this);
             }
 
             SetVisible(visible);
