@@ -9,7 +9,7 @@ public static class Noise
         Global
     }
 
-    // These are what the ML agent will control for terrain generation
+    // These can be what the ML agent will control for terrain/map generation
     public static float[,] GenerateNoiseMap(int mapWidth, int mapHeight, float scale, int octaves, float persistance, float lacunarity, int seed, Vector2 offset, NormalizeMode normalizeMode, float globalNoiseEstimator = 1f)
     {
         float[,] noiseMap = new float[mapWidth, mapHeight];

@@ -3,12 +3,13 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 
-[System.Serializable]
-public struct TerrainType {
-    public string terrainName;
-    public float height;
-    public Color color;
-}
+public enum DrawMode
+{
+    NoiseMap,
+    ColorMap,
+    FalloffMap,
+    Mesh
+};
 
 public struct MapData
 {
@@ -23,11 +24,13 @@ public struct MapData
     }
 }
 
-public enum DrawMode {
-    NoiseMap,
-    ColorMap,
-    Mesh
-};
+[System.Serializable]
+public struct TerrainType {
+    public string terrainName;
+    public float height;
+    public Color color;
+}
+
 
 public class MapGenerator : MonoBehaviour
 {
@@ -48,7 +51,6 @@ public class MapGenerator : MonoBehaviour
 
     [Range(0, 6)]
     public int editorLevelOfDetail;
-
 
     [Header("Noise Parameters")]
     // ML STUFF: These Values will be modified by the ML agent to create different terrain maps
@@ -74,13 +76,16 @@ public class MapGenerator : MonoBehaviour
     public float heightMultiplier;
     public AnimationCurve heightCurve;
 
+    public bool useFalloff;
+    public AnimationCurve falloffCurve;
+
     //  ML STUFF: This can be randomized by the ML agent when generating types of forests, plains, deserts, mountains, islands, plateaus etc
     // Could be based on the noise parameters or certain limits can be assigned to noise parameters based on the kind of reion to generate
     // This can also be used to make sure all the regions appear in the generations(make sure mountains have snowy peaks for example)
     public TerrainType[] regions;
 
     MapDisplay mapDisplay;
-
+    float[,] fallOffMap;
     // Struct to handle map data and thread data
     // Generic so that it can handle both
     struct MapThreadInfo<T>
@@ -99,9 +104,24 @@ public class MapGenerator : MonoBehaviour
     Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
     Queue<MapThreadInfo<MeshData>> meshDataThreadInfoQueue = new Queue<MapThreadInfo<MeshData>>();
 
+    void Awake()
+    {
+        fallOffMap = FalloffGenerator.GenerateFallOfMap(mapChunkSize, falloffCurve);
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        mapDisplay = this.GetComponent<MapDisplay>();
+    }
+
     public void DrawMapInEditor()
     {
-        if(mapDisplay == null)
+        if(useFalloff)
+        {
+            fallOffMap = FalloffGenerator.GenerateFallOfMap(mapChunkSize, falloffCurve);
+        }
+        if (mapDisplay == null)
         {
             mapDisplay = FindObjectOfType<MapDisplay>();
         }
@@ -114,6 +134,10 @@ public class MapGenerator : MonoBehaviour
         else if (drawMode == DrawMode.ColorMap)
         {
             mapDisplay.DrawTexture(TextureGenerator.TextureFromColorMap(mapData.colorMap, mapChunkSize, mapChunkSize));
+        }
+        else if (drawMode == DrawMode.FalloffMap)
+        {
+            mapDisplay.DrawTexture(TextureGenerator.TextureFromHeightMap(FalloffGenerator.GenerateFallOfMap(mapChunkSize, falloffCurve)));
         }
         else if (drawMode == DrawMode.Mesh)
         {
@@ -212,6 +236,10 @@ public class MapGenerator : MonoBehaviour
         {
             for(int x = 0; x < mapChunkSize; x++)
             {
+                if(useFalloff)
+                {
+                    noiseMap[x, y] = Mathf.Clamp(noiseMap[x, y] - fallOffMap[x, y], 0 ,1);
+                }
                 float currentHeight = noiseMap[x, y];
                 for(int i = 0; i < regions.Length; i++)
                 {
@@ -227,12 +255,5 @@ public class MapGenerator : MonoBehaviour
         }
 
         return new MapData(noiseMap, colorMap);
-    }
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        mapDisplay = this.GetComponent<MapDisplay>();
     }
 }
