@@ -19,14 +19,17 @@ public class MapGeneratorEditor : Editor
             }
         }
 
-        if (mapGen.drawMode == DrawMode.ColorMap || mapGen.drawMode == DrawMode.FalloffMap || mapGen.drawMode == DrawMode.NoiseMap)
+        if(mapGen.mapDisplay)
         {
-            mapGen.ShowTexturePreview();
-        }
+            if (mapGen.drawMode == DrawMode.ColorMap || mapGen.drawMode == DrawMode.FalloffMap || mapGen.drawMode == DrawMode.NoiseMap)
+            {
+                mapGen.mapDisplay.ShowTexturePreview();
+            }
 
-        if (mapGen.drawMode == DrawMode.Mesh)
-        {
-            mapGen.ShowMeshPreview();
+            if (mapGen.drawMode == DrawMode.Mesh)
+            {
+                mapGen.mapDisplay.ShowMeshPreview();
+            }
         }
 
         if (GUILayout.Button("Generate"))

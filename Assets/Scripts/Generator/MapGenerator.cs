@@ -85,7 +85,7 @@ public class MapGenerator : MonoBehaviour
     // This can also be used to make sure all the regions appear in the generations(make sure mountains have snowy peaks for example)
     public TerrainType[] regions;
 
-    MapDisplay mapDisplay;
+    public MapDisplay mapDisplay;
     float[,] fallOffMap;
     // Struct to handle map data and thread data
     // Generic so that it can handle both
@@ -257,25 +257,5 @@ public class MapGenerator : MonoBehaviour
         }
 
         return new MapData(noiseMap, colorMap);
-    }
-
-
-
-    public void ShowTexturePreview()
-    {
-        if(!mapDisplay.textureRender.gameObject.activeSelf)
-        {
-            mapDisplay.textureRender.gameObject.SetActive(true);
-            mapDisplay.meshRednerer.gameObject.SetActive(false);
-        }
-    }
-
-    public void ShowMeshPreview()
-    {
-        if (!mapDisplay.meshRednerer.gameObject.activeSelf)
-        {
-            mapDisplay.meshRednerer.gameObject.SetActive(true);
-            mapDisplay.textureRender.gameObject.SetActive(false);
-        }
     }
 }

@@ -27,4 +27,22 @@ public class MapDisplay : MonoBehaviour
         meshFilter.sharedMesh = meshData.CreateMesh();
         meshRednerer.sharedMaterial.mainTexture = texture;
     }
+
+    public void ShowTexturePreview()
+    {
+        if (!textureRender.gameObject.activeSelf)
+        {
+            textureRender.gameObject.SetActive(true);
+            meshRednerer.gameObject.SetActive(false);
+        }
+    }
+
+    public void ShowMeshPreview()
+    {
+        if (!meshRednerer.gameObject.activeSelf)
+        {
+            meshRednerer.gameObject.SetActive(true);
+            textureRender.gameObject.SetActive(false);
+        }
+    }
 }
