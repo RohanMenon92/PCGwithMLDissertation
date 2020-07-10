@@ -19,6 +19,16 @@ public class MapGeneratorEditor : Editor
             }
         }
 
+        if (mapGen.drawMode == DrawMode.ColorMap || mapGen.drawMode == DrawMode.FalloffMap || mapGen.drawMode == DrawMode.NoiseMap)
+        {
+            mapGen.ShowTexturePreview();
+        }
+
+        if (mapGen.drawMode == DrawMode.Mesh)
+        {
+            mapGen.ShowMeshPreview();
+        }
+
         if (GUILayout.Button("Generate"))
         {
             mapGen.DrawMapInEditor();

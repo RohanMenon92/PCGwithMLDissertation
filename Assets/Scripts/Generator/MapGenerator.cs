@@ -118,13 +118,13 @@ public class MapGenerator : MonoBehaviour
 
     public void DrawMapInEditor()
     {
-        if(useFalloff)
-        {
-            fallOffMap = FalloffGenerator.GenerateFallOfMap(mapChunkSize, falloffCurve);
-        }
         if (mapDisplay == null)
         {
             mapDisplay = FindObjectOfType<MapDisplay>();
+        }
+        if (useFalloff)
+        {
+            fallOffMap = FalloffGenerator.GenerateFallOfMap(mapChunkSize, falloffCurve);
         }
         MapData mapData = GenerateMapData(Vector2.zero);
 
@@ -257,5 +257,25 @@ public class MapGenerator : MonoBehaviour
         }
 
         return new MapData(noiseMap, colorMap);
+    }
+
+
+
+    public void ShowTexturePreview()
+    {
+        if(!mapDisplay.textureRender.gameObject.activeSelf)
+        {
+            mapDisplay.textureRender.gameObject.SetActive(true);
+            mapDisplay.meshRednerer.gameObject.SetActive(false);
+        }
+    }
+
+    public void ShowMeshPreview()
+    {
+        if (!mapDisplay.meshRednerer.gameObject.activeSelf)
+        {
+            mapDisplay.meshRednerer.gameObject.SetActive(true);
+            mapDisplay.textureRender.gameObject.SetActive(false);
+        }
     }
 }

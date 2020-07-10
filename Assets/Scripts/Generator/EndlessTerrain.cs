@@ -101,6 +101,7 @@ public class EndlessTerrain : MonoBehaviour
         Bounds bounds;
 
         MeshRenderer meshRenderer;
+        MeshCollider meshCollider;
         MeshFilter meshFilter;
 
         // LOD Data
@@ -125,6 +126,7 @@ public class EndlessTerrain : MonoBehaviour
             meshObject = new GameObject("TerrainChunk_" + coord.x + ":" + coord.y);
             meshFilter = meshObject.AddComponent<MeshFilter>();
             meshRenderer = meshObject.AddComponent<MeshRenderer>();
+            meshCollider = meshObject.AddComponent<MeshCollider>();
 
             meshObject.transform.parent = parent;
             meshObject.transform.position = chunkPosition * terrainScale;
@@ -192,7 +194,9 @@ public class EndlessTerrain : MonoBehaviour
                     LODMesh lodMesh = lodMeshes[lodIndex];
                     if(lodMesh.hasMesh)
                     {
+                        prevLODIndex = lodIndex;
                         meshFilter.mesh = lodMesh.mesh;
+                        meshCollider.sharedMesh = lodMesh.mesh;
                     } else if(!lodMesh.hasRequestedMesh)
                     {
                         lodMesh.RequestMesh(mapData);

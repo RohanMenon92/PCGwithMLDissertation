@@ -9,6 +9,13 @@ public class MapDisplay : MonoBehaviour
     public MeshFilter meshFilter;
     public MeshRenderer meshRednerer;
 
+    private void Start()
+    {
+        // Hide preview Assets
+        textureRender.gameObject.SetActive(false);
+        meshRednerer.gameObject.SetActive(false);
+    }
+
     public void DrawTexture(Texture2D texture)
     {
         textureRender.sharedMaterial.mainTexture = texture;
