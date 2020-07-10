@@ -45,8 +45,9 @@ public class MapGenerator : MonoBehaviour
     //[Min(10)]
     //public int mapHeight;
 
-    // 240 is divisible by a lot more factors than the unity limit for chunk size (255)
-    public const int mapChunkSize = 241;
+    // 241 - 1 = 240 is divisible by a lot more factors than the unity limit for chunk size (255)
+    // 239 Because we are adding 2 vertices for the padding
+    public const int mapChunkSize = 239;
     public float terrainScale = 1f;
 
     [Range(0, 6)]
@@ -227,8 +228,9 @@ public class MapGenerator : MonoBehaviour
 
     MapData GenerateMapData(Vector2 center)
     {
-        // Generate Initial Noisemap
-        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize, mapChunkSize, noiseScale, octaves, persistence, lacunarity, seed, center + offset, noiseNormalized, noiseEstimatorVariable);
+        // Generate Initial Noisemap 
+        // with additional padding for normal calculation
+        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunkSize + 2, mapChunkSize + 2, noiseScale, octaves, persistence, lacunarity, seed, center + offset, noiseNormalized, noiseEstimatorVariable);
 
         // Create Color map
         Color[] colorMap = new Color[mapChunkSize * mapChunkSize]; 
