@@ -85,6 +85,8 @@ public static class MeshGenerator
             }
         }
 
+        meshData.BakeNormals();
+
         // For threading in unity, return meshdata in the thread and return all of it outside of it
         return meshData;
     }
@@ -96,6 +98,7 @@ public class MeshData {
     int[] triangles;
     Vector2[] uvs;
 
+    Vector3[] bakedNormals;
     Vector3[] borderVertices;
     int[] borderTriangles;
 
@@ -145,6 +148,11 @@ public class MeshData {
             triangles[triangleIndex + 2] = c;
             triangleIndex += 3;
         }
+    }
+
+    public void BakeNormals()
+    {
+        bakedNormals = CalculateNormals();
     }
 
     Vector3[] CalculateNormals()
@@ -211,7 +219,7 @@ public class MeshData {
         mesh.vertices = vertices;
         mesh.triangles = triangles;
         mesh.uv = uvs;
-        mesh.normals = CalculateNormals();
+        mesh.normals = bakedNormals;
         return mesh;
     }
 }
