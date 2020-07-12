@@ -69,7 +69,7 @@ public class EndlessTerrain : MonoBehaviour
 
         // Set map Generator
         mapGen = FindObjectOfType<MapGenerator>();
-        terrainScale = mapGen.terrainScale;
+        terrainScale = mapGen.terrainData.terrainScale;
 
         // Size of vertices in chunks is actually 1 less than this number
         chunkSize = MapGenerator.mapChunkSize - 1;
