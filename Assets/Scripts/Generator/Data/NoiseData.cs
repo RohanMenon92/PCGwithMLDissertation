@@ -25,9 +25,11 @@ public class NoiseData : UpdatableData
     public int seed;
     public Vector2 offset;
 
+#if (UNITY_EDITOR)
     // For updatable data Onvalidate
     protected override void OnValidate()
     {
         base.OnValidate();
     }
+#endif
 }

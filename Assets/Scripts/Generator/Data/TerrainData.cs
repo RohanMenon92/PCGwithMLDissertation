@@ -16,12 +16,13 @@ public class TerrainData : UpdatableData
 
     public bool useFlatShading;
 
+#if (UNITY_EDITOR)
     // For updatable data Onvalidate
     protected override void OnValidate()
     {
         base.OnValidate();
     }
-
+#endif
     public float minHeight
     {
         get
