@@ -5,27 +5,9 @@ using UnityEngine;
 
 public static class MeshGenerator
 {
-    public const int numSupportedLODs = 5;
-    public const int numSupportedChunkSizes = 9;
-    public const int numSupportedFlatShadedChunkSizes = 3;
-
-    // Chunk Size for regular terrain
-    // 241 - 1 = 240 is divisible by a lot more factors than the unity limit for vertex chunk size (255)
-    // 239 Because we are adding 2 vertices for the padding
-    public static readonly int[] supportedMeshSizes = { 48, 72, 96, 120, 144, 168, 192, 216, 240 };
-
-    // Minimum Chunk size for flat shading
-    // 96 - 1 = 95 is not divisible by 5,  
-    // limit for vertex chunk size (255) but we create a lot more vertexes when using flat shading(each triangle is independent)
-    public static readonly int[] supportedFlatShadedMeshSizes = { 48, 72, 96};
-
     // Getting called from a seperate thread
-    public static MeshData GenerateTerrainMesh(float[,] heightMap, float heightMultiplier, AnimationCurve heightCurve, int levelOfDetail, bool useFlatShading)
+    public static MeshData GenerateTerrainMesh(float[,] heightMap, int levelOfDetail, MeshSettings meshSettings)
     {
-        // Create a new height Curve because curve evaluation will cause problems when accessed from different threads
-        // Alternatively, lock the thread but it is slower
-        AnimationCurve threadHeightCurve = new AnimationCurve(heightCurve.keys);
-
         // mesh LOD increment to ignore vertices
         int meshLODIncrement = (levelOfDetail == 0) ? 1 : levelOfDetail * 2;
 
@@ -45,7 +27,7 @@ public static class MeshGenerator
 
         int verticesPerLine = (meshSize - 1) / meshLODIncrement + 1;
 
-        MeshData meshData = new MeshData(verticesPerLine, useFlatShading);
+        MeshData meshData = new MeshData(verticesPerLine, meshSettings.useFlatShading);
 
         for (int y = 0; y < borderedSize; y += meshLODIncrement)
         {
@@ -78,8 +60,8 @@ public static class MeshGenerator
                 int vertexIndex = vertexIndicesMap[x, y];
                 // Center by dividing x - LODIncrement by the mesh size(UV as a percentage of the width)
                 Vector2 percentUV = new Vector2((x - meshLODIncrement) / (float)meshSize, (y - meshLODIncrement) / (float)meshSize);
-                float height = threadHeightCurve.Evaluate(heightMap[x, y]) * heightMultiplier;
-                Vector3 vertexPosition = new Vector3(topLeftX + percentUV.x * meshSizeUnSimplified, height, topLeftZ - percentUV.y * meshSizeUnSimplified);
+
+                Vector3 vertexPosition = new Vector3((topLeftX + percentUV.x * meshSizeUnSimplified) * meshSettings.terrainScale, heightMap[x, y], (topLeftZ - percentUV.y * meshSizeUnSimplified) * meshSettings.terrainScale);
 
                 meshData.AddVertex(vertexPosition, percentUV, vertexIndex);
 

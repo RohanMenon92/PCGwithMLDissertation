@@ -37,11 +37,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Tex5:
-        m_Texture: {fileID: 2800000, guid: c454ab598058d19449addc55a13cc73a, type: 3}
+        m_Texture: {fileID: 2800000, guid: 22da49d227e55449d9ab0dbc09fe7f46, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_14554DA9:
-        m_Texture: {fileID: 2800000, guid: 22da49d227e55449d9ab0dbc09fe7f46, type: 3}
+        m_Texture: {fileID: 2800000, guid: 4d29d513ad3914f329ec976bbc4c5519, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - Texture2D_8370F782:
@@ -61,17 +61,17 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - MaxHeight: 50
+    - MaxHeight: 100
     - MinHeight: 0
     - Vector1_2A193917: 0.2
     - Vector1_35408CC2: 0.2
     - Vector1_38C465F: 0.2
     - Vector1_4706D3CD: 2
-    - Vector1_A2AD578C: 0.25
-    - Vector1_A309F83A: 0.05
+    - Vector1_A2AD578C: 0.313
+    - Vector1_A309F83A: 0.043
     - Vector1_C90913A2: 0.015
-    - Vector1_DCA044C6: 0.8
+    - Vector1_DCA044C6: 0.338
     - Vector1_E1CCAF0D: 0.2
-    - Vector1_E95127F: 0.4
+    - Vector1_E95127F: 0.247
     - Vector1_F657C8BB: 0.2
     m_Colors: []
