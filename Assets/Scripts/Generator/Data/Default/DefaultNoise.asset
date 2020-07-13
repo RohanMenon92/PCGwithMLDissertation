@@ -16,8 +16,8 @@ MonoBehaviour:
   noiseNormalized: 1
   noiseEstimatorVariable: 1.5
   noiseScale: 40
-  octaves: 8
-  persistence: 0.5
-  lacunarity: 2
+  octaves: 10
+  persistence: 0.6
+  lacunarity: 1.6
   seed: 150
   offset: {x: 0, y: 0}

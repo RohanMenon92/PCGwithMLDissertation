@@ -6,6 +6,9 @@ public static class FalloffGenerator
 {
     public static float[,] GenerateFallOfMap(int size, AnimationCurve falloffCurve)
     {
+        // fallOffCurve will break on multiThreading, fix with creating a new curve instance
+        AnimationCurve falloffCurveInstance = new AnimationCurve(falloffCurve.keys);
+
         float[,] map = new float[size, size];
         for (int i = 0; i < size; i++)
         {
@@ -15,7 +18,7 @@ public static class FalloffGenerator
                 float y = j / (float)size * 2 - 1;
 
                 float value = Mathf.Max(Mathf.Abs(x), Mathf.Abs(y));
-                map[i, j] = falloffCurve.Evaluate(value);
+                map[i, j] = falloffCurveInstance.Evaluate(value);
             }
         }
         return map;
