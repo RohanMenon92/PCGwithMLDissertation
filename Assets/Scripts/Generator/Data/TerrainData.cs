@@ -21,4 +21,20 @@ public class TerrainData : UpdatableData
     {
         base.OnValidate();
     }
+
+    public float minHeight
+    {
+        get
+        {
+            return terrainScale * heightMultiplier * heightCurve.Evaluate(0);
+        }
+    }
+
+    public float maxHeight
+    {
+        get
+        {
+            return terrainScale * heightMultiplier * heightCurve.Evaluate(1);
+        }
+    }
 }

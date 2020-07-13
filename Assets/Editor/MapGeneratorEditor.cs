@@ -21,7 +21,7 @@ public class MapGeneratorEditor : Editor
 
         if(mapGen.mapDisplay)
         {
-            if (mapGen.drawMode == DrawMode.ColorMap || mapGen.drawMode == DrawMode.FalloffMap || mapGen.drawMode == DrawMode.NoiseMap)
+            if (mapGen.drawMode == DrawMode.FalloffMap || mapGen.drawMode == DrawMode.NoiseMap)
             {
                 mapGen.mapDisplay.ShowTexturePreview();
             }

@@ -12,7 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c640851110363d4d82f34f5abc0eaa2, type: 3}
   m_Name: DefaultNoise
   m_EditorClassIdentifier: 
-  noiseNormalized: 0
+  autoUpdate: 1
+  noiseNormalized: 1
   noiseEstimatorVariable: 1.5
   noiseScale: 40
   octaves: 8

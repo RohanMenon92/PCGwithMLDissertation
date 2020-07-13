@@ -185,10 +185,10 @@ public class EndlessTerrain : MonoBehaviour
             mapDataReceived = true;
 
             // Create color map for this map data
-            Texture2D texture = TextureGenerator.TextureFromColorMap(mapData.colorMap, MapGenerator.mapChunkSize, MapGenerator.mapChunkSize);
+            //Texture2D texture = TextureGenerator.TextureFromColorMap(mapData.colorMap, MapGenerator.mapChunkSize, MapGenerator.mapChunkSize);
             // Set smoothness to zero because lit instances will be used
+            meshRenderer.material = mapGen.terrainMaterial;
             meshRenderer.material.SetFloat("_Smoothness", 0f);
-            meshRenderer.material.mainTexture = texture;
 
             UpdateTerrainChunk();
             //print("Map Data received");
