@@ -87,7 +87,7 @@ public class TerrainChunk
     {
         // Add request for data in mapGenererator and create a thread
         // Lamda expression required because parameters cannot be passed
-        ThreadDataRequester.RequestData(() => HeightMapGenerator.GenerateHeightMap(meshSettings.numVertexesPerLine, meshSettings.numVertexesPerLine, heightMapSettings, sampleCenter), OnHeightMapReceived);
+        ThreadDataRequester.RequestData(() => HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine, meshSettings.numVertsPerLine, heightMapSettings, sampleCenter), OnHeightMapReceived);
     }
 
 

@@ -101,7 +101,7 @@ public class MapPreview : MonoBehaviour
 
     public void DrawMapInEditor()
     {
-        HeightMap heightMap = HeightMapGenerator.GenerateHeightMap(meshSettings.numVertexesPerLine, meshSettings.numVertexesPerLine, heightMapSettings, Vector2.zero);
+        HeightMap heightMap = HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine, meshSettings.numVertsPerLine, heightMapSettings, Vector2.zero);
 
         if (drawMode == DrawMode.NoiseMap)
         {
@@ -109,7 +109,7 @@ public class MapPreview : MonoBehaviour
         }
         else if (drawMode == DrawMode.FalloffMap)
         {
-            DrawTexture(TextureGenerator.TextureFromHeightMap(new HeightMap(FalloffGenerator.GenerateFallOfMap(meshSettings.numVertexesPerLine, heightMapSettings.falloffCurve), 0, 1)));
+            DrawTexture(TextureGenerator.TextureFromHeightMap(new HeightMap(FalloffGenerator.GenerateFallOfMap(meshSettings.numVertsPerLine, heightMapSettings.falloffCurve), 0, 1)));
         }
         else if (drawMode == DrawMode.Mesh)
         {

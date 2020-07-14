@@ -29,11 +29,12 @@ public class MeshSettings : UpdatableData
 
     // Return different values for mapChunkSize when using flatShading
     // Size includes 2 extra vertices for calculating normals at the edge hence + 1 instead of - 1 like earlier
-    public int numVertexesPerLine
+    // Size now includes extra buffer vertices for LOD map generation too, 2 on each side (+4)
+    public int numVertsPerLine
     {
         get
         {
-            return supportedMeshSizes[useFlatShading ? flatShadedChunkSizeIndex : chunkSizeIndex] + 1;
+            return supportedMeshSizes[useFlatShading ? flatShadedChunkSizeIndex : chunkSizeIndex] + 5;
         }
     }
 
@@ -41,7 +42,7 @@ public class MeshSettings : UpdatableData
     {
         get
         {
-            return (numVertexesPerLine - 3) * terrainScale;
+            return (numVertsPerLine - 3) * terrainScale;
         }
     }
 
