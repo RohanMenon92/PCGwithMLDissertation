@@ -7,12 +7,13 @@ public class TerrainChunk
 {
     const float colliderGenrationThreshold = 5f;
     public event System.Action<TerrainChunk, bool> OnVisibilityChanged;
-
+    
     public Vector2 coord;
-    GameObject meshObject;
+    public Vector2 chunkPosition;
     Vector2 sampleCenter;
     Bounds bounds;
 
+    GameObject meshObject;
     MeshRenderer meshRenderer;
     MeshFilter meshFilter;
     MeshCollider meshCollider;
@@ -33,6 +34,8 @@ public class TerrainChunk
     MeshSettings meshSettings;
     Transform viewer;
     Material meshMaterial;
+    ObjectCreator objectCreator;
+
 
     Vector2 viewerPosition
     {
@@ -42,11 +45,12 @@ public class TerrainChunk
         }
     }
 
-    public TerrainChunk(Vector2 coord, HeightMapSettings heightMapSettings, MeshSettings meshSettings, LODInfo[] detailLevels, int colliderLODindex, Transform parent, Transform viewer, Material meshMaterial)
+    public TerrainChunk(Vector2 coord, HeightMapSettings heightMapSettings, MeshSettings meshSettings, LODInfo[] detailLevels, int colliderLODindex, Transform parent, Transform viewer, Material meshMaterial, ObjectCreator objectCreator)
     {
         this.coord = coord;
         this.detailLevels = detailLevels;
         this.colliderLODindex = colliderLODindex;
+        this.objectCreator = objectCreator;
 
         this.heightMapSettings = heightMapSettings;
         this.meshSettings = meshSettings;
@@ -56,9 +60,8 @@ public class TerrainChunk
         // max view distance should be last detail level
         maxViewDst = detailLevels[detailLevels.Length - 1].visibleDstThreshold;
         sampleCenter = coord * meshSettings.meshWorldSize / meshSettings.terrainScale;
-        Vector2 chunkPosition = coord * meshSettings.meshWorldSize;
+        chunkPosition = coord * meshSettings.meshWorldSize;
         bounds = new Bounds(chunkPosition, Vector2.one * meshSettings.meshWorldSize);
-
 
         // Create plane
         meshObject = new GameObject("TerrainChunk_" + coord.x + ":" + coord.y);
@@ -170,6 +173,7 @@ public class TerrainChunk
         {
             return;
         }
+
         float sqrDistnceFromViewerEdge = bounds.SqrDistance(viewerPosition);
 
         if (sqrDistnceFromViewerEdge < detailLevels[colliderLODindex].sqrVisibleDistanceThreshold)
@@ -186,6 +190,8 @@ public class TerrainChunk
             {
                 meshCollider.sharedMesh = lodMeshes[colliderLODindex].mesh;
                 hasSetCollider = true;
+
+                objectCreator.OnCreateObjectsForChunk(this, new Vector2(bounds.size.x, bounds.size.y));
             }
         }
     }

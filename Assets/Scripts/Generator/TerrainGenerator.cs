@@ -44,9 +44,13 @@ public class TerrainGenerator : MonoBehaviour
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
     List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
 
+    ObjectCreator objectCreator;
+
     // Start is called before the first frame update
     void Start()
     {
+        objectCreator = FindObjectOfType<ObjectCreator>();
+
         terrainScale = meshSettings.terrainScale;
 
         // Size of vertices in chunks is actually 1 less than this number
@@ -114,7 +118,7 @@ public class TerrainGenerator : MonoBehaviour
                     }
                     else
                     {
-                        TerrainChunk newChunk = new TerrainChunk(viewedChunkCoord, heightMapSettings, meshSettings, detailLevels, colliderLODindex, transform, viewer, terrainMaterial);
+                        TerrainChunk newChunk = new TerrainChunk(viewedChunkCoord, heightMapSettings, meshSettings, detailLevels, colliderLODindex, transform, viewer, terrainMaterial, objectCreator);
                         // Add new terrain chunk and parent it to this transform
                         terrainChunkDictionary.Add(viewedChunkCoord, newChunk);
                         newChunk.OnVisibilityChanged += OnTerrainChunkVisibilityChanged;

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DefaultHeightMapSetting
   m_EditorClassIdentifier: 
   autoUpdate: 1
-  heightMultiplier: 100
+  heightMultiplier: 50
   heightCurve:
     serializedVersion: 2
     m_Curve:
@@ -84,8 +84,8 @@ MonoBehaviour:
   noiseSettings:
     normalizeMode: 1
     noiseEstimatorVariable: 1.5
-    scale: 50
-    octaves: 6
+    scale: 25
+    octaves: 8
     persistence: 0.5
     lacunarity: 1.5
     seed: 0
