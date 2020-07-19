@@ -10,8 +10,9 @@ public class TerrainChunk
     
     public Vector2 coord;
     public Vector2 chunkPosition;
+    public Bounds bounds;
+
     Vector2 sampleCenter;
-    Bounds bounds;
 
     GameObject meshObject;
     MeshRenderer meshRenderer;
@@ -191,7 +192,7 @@ public class TerrainChunk
                 meshCollider.sharedMesh = lodMeshes[colliderLODindex].mesh;
                 hasSetCollider = true;
 
-                objectCreator.OnCreateObjectsForChunk(this, new Vector2(bounds.size.x, bounds.size.y));
+                objectCreator.OnCreateObjectsForChunk(this);
             }
         }
     }

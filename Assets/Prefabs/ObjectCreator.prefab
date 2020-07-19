@@ -43,9 +43,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a69cce2281146747a3b59238be57a1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 1
-  regionSize: {x: 1, y: 1}
-  rejectionSamples: 30
-  displayRadius: 1
+  radius: 2
+  regionSize: {x: 20, y: 20}
+  rejectionSamples: 200
+  displayRadius: 0.5
   spawnObjectPrefab: {fileID: 8378585445341556765, guid: 0f8ddd0e2fbc9354082431b0d1ed2949,
     type: 3}

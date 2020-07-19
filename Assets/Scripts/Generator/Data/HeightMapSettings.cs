@@ -9,7 +9,7 @@ public class HeightMapSettings : UpdatableData
     {
         get
         {
-            return heightMultiplier * heightCurve.Evaluate(0);
+            return heightMultiplier * heightCurve.Evaluate(0) * (noiseSettings.normalizeMode == Noise.NormalizeMode.Global ? noiseSettings.noiseEstimatorVariable : 1);
         }
     }
 
@@ -17,7 +17,7 @@ public class HeightMapSettings : UpdatableData
     {
         get
         {
-            return heightMultiplier * heightCurve.Evaluate(1);
+            return heightMultiplier * heightCurve.Evaluate(1) * (noiseSettings.normalizeMode == Noise.NormalizeMode.Global ? noiseSettings.noiseEstimatorVariable : 1);
         }
     }
 

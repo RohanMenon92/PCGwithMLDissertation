@@ -32,6 +32,8 @@ public class MapPreview : MonoBehaviour
     public MeshFilter meshFilter;
     public MeshRenderer meshRednerer;
 
+    ObjectCreator objectCreator;
+
     private void Start()
     {
         // Hide preview Assets
@@ -47,7 +49,20 @@ public class MapPreview : MonoBehaviour
 
     public void DrawMesh(MeshData meshData)
     {
-        meshFilter.sharedMesh = meshData.CreateMesh();
+        Mesh generatedMesh = meshData.CreateMesh();
+        meshFilter.sharedMesh = generatedMesh;
+
+        if (objectCreator == null)
+        {
+            objectCreator = FindObjectOfType<ObjectCreator>();
+        }
+
+        MeshCollider meshCollider = meshFilter.GetComponent<MeshCollider>();
+        if (meshCollider != null)
+        {
+            meshCollider.sharedMesh = generatedMesh;
+            objectCreator.OnCreateObjectsForPreviewChunk();
+        }
     }
 
     public void ShowTexturePreview()
