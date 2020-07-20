@@ -278,7 +278,6 @@ public class ObjectCreator : MonoBehaviour
             {
                 treeTypeToSpawn = TreeTypes.High;
             }
-
             ReturnTreeToPool(trans.gameObject, treeTypeToSpawn);
         }
 
