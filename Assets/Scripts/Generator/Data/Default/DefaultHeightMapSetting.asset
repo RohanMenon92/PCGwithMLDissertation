@@ -93,7 +93,7 @@ MonoBehaviour:
   noiseSettings:
     normalizeMode: 1
     noiseEstimatorVariable: 1.5
-    scale: 25
+    scale: 50
     octaves: 8
     persistence: 0.4
     lacunarity: 2

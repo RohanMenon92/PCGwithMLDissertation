@@ -61,7 +61,7 @@ public class MapPreview : MonoBehaviour
         if (meshCollider != null)
         {
             meshCollider.sharedMesh = generatedMesh;
-            objectCreator.OnCreateObjectsForPreviewChunk();
+            objectCreator.OnCreateTreesForPreviewChunk();
         }
     }
 

@@ -12,6 +12,9 @@ public class TerrainChunk
     public Vector2 chunkPosition;
     public Bounds bounds;
 
+    public bool hasSetCollider = false;
+    public bool hasObjects = false;
+
     Vector2 sampleCenter;
 
     GameObject meshObject;
@@ -26,8 +29,6 @@ public class TerrainChunk
 
     HeightMap heightMap;
     bool heightMapReceived;
-    bool hasSetCollider = false;
-
     float maxViewDst;
 
     int prevLODIndex = -1;
@@ -192,7 +193,7 @@ public class TerrainChunk
                 meshCollider.sharedMesh = lodMeshes[colliderLODindex].mesh;
                 hasSetCollider = true;
 
-                objectCreator.OnCreateObjectsForChunk(this);
+                objectCreator.OnCreateTreesForChunk(this);
             }
         }
     }
