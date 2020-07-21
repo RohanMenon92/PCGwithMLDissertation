@@ -12,11 +12,13 @@ public static class HeightMapGenerator
         float minValue = float.MaxValue;
         float maxValue = float.MinValue;
 
+        float[,] fallOffValues = FalloffGenerator.GenerateFallOfMap(width, settings.falloffCurve);
+
         for (int i = 0; i < width; i++)
         {
             for (int j = 0; j < height; j++)
             {
-                values[i, j] *= heightCurve.Evaluate(values[i, j]) * settings.heightMultiplier;
+                values[i, j] *= (heightCurve.Evaluate(values[i, j]) * settings.heightMultiplier);
 
                 if (values[i, j] > maxValue)
                 {
@@ -26,8 +28,14 @@ public static class HeightMapGenerator
                 {
                     minValue = values[i, j];
                 }
+
+                if (settings.useFalloff)
+                {
+                    values[i, j] *= fallOffValues[i, j];
+                }
             }
         }
+
         return new HeightMap(values, minValue, maxValue);
     }
 }
