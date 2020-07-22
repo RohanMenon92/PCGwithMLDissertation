@@ -189,56 +189,57 @@ public class ObjectCreator : MonoBehaviour
     // Returning Trees to pool
     public void ReturnTreeToPool(GameObject treeToStore, TreeTypes treeType)
     {
+        treeToStore.SetActive(false);
         if (treeType == TreeTypes.Low)
         {
-            // Return to normal bullet pool
             treeToStore.transform.SetParent(unusedLowTreesPool);
         }
         else if (treeType == TreeTypes.Mid)
         {
-            // Return to shotgun bullet pool
             treeToStore.transform.SetParent(unusedMidTreesPool);
         }
         else if (treeType == TreeTypes.High)
         {
-            // Return to laser bullet pool
             treeToStore.transform.SetParent(unusedHighTreesPool);
         }
-        treeToStore.gameObject.SetActive(false);
         treeToStore.transform.localScale = Vector3.one;
-        treeToStore.transform.position = Vector3.one * -100;
+        treeToStore.transform.position = Vector3.zero;
     }
 
-    public void OnCreateTreesForChunk(TerrainChunk chunk)
+    public void BuildChunkTreesFromPoints(TerrainChunk chunk, List<Vector2> treePoints)
     {
-        if(chunk.hasObjects)
+        if (chunk.hasTrees)
         {
             return;
         }
+
+        chunk.hasTrees = true;
+
         float newSizeX = chunk.bounds.size.x / regionSize.x;
         float newSizeY = chunk.bounds.size.y / regionSize.y;
 
-        points = PoissonDiscSampling.GeneratePoints(radius, regionSize, rejectionSamples);
-
-        foreach(Vector2 point in points)
+        foreach (Vector2 point in treePoints)
         {
             RaycastHit raycastHit;
             // Fire a ray going down
             // multiply by 0.45f to allow some buffer space between chunks
-            if (Physics.Raycast(new Vector3((chunk.chunkPosition.x - chunk.bounds.size.x * 0.45f) + (point.x * newSizeX), 200, (chunk.chunkPosition.y - chunk.bounds.size.y * 0.45f) + (point.y * newSizeY)), new Vector3(0, -1, 0), out raycastHit)) {
+            if (Physics.Raycast(new Vector3((chunk.chunkPosition.x - chunk.bounds.size.x * 0.45f) + (point.x * newSizeX), 200, (chunk.chunkPosition.y - chunk.bounds.size.y * 0.45f) + (point.y * newSizeY)), new Vector3(0, -1, 0), out raycastHit))
+            {
                 //Debug.DrawRay(new Vector3(chunk.chunkPosition.x + point.x, 200, chunk.chunkPosition.y + point.y), new Vector3(0, -1, 0));
 
                 // If it collides with a terrainChunk
-                if (raycastHit.transform.name.Contains("TerrainChunk"))
+                if (raycastHit.transform.name == chunk.meshObject.name)
                 {
                     TreeTypes treeTypeToSpawn = TreeTypes.Low;
-                    if(raycastHit.point.y < treeLowHeight)
+                    if (raycastHit.point.y < treeLowHeight)
                     {
                         treeTypeToSpawn = TreeTypes.Low;
-                    } else if(raycastHit.point.y < treeMidHeight)
+                    }
+                    else if (raycastHit.point.y < treeMidHeight)
                     {
                         treeTypeToSpawn = TreeTypes.Mid;
-                    } else
+                    }
+                    else
                     {
                         treeTypeToSpawn = TreeTypes.High;
                     }
@@ -251,26 +252,78 @@ public class ObjectCreator : MonoBehaviour
                 }
             }
         }
-
-        chunk.hasObjects = true;
     }
 
-    public void ReturnChunkObjectsToPool(TerrainChunk chunk)
+    public List<Vector2> OnCreateNewTreesForChunk(TerrainChunk chunk)
     {
-        if(!chunk.hasObjects)
+        if(chunk.hasCreatedTrees)
+        {
+            return null;
+        }
+
+        chunk.hasCreatedTrees = true;
+        //chunk.hasObjects = true;
+
+        float newSizeX = chunk.bounds.size.x / regionSize.x;
+        float newSizeY = chunk.bounds.size.y / regionSize.y;
+
+        points = PoissonDiscSampling.GeneratePoints(radius, regionSize, rejectionSamples);
+
+        //foreach(Vector2 point in points)
+        //{
+        //    RaycastHit raycastHit;
+        //    // Fire a ray going down
+        //    // multiply by 0.45f to allow some buffer space between chunks
+        //    if (Physics.Raycast(new Vector3((chunk.chunkPosition.x - chunk.bounds.size.x * 0.45f) + (point.x * newSizeX), 200, (chunk.chunkPosition.y - chunk.bounds.size.y * 0.45f) + (point.y * newSizeY)), new Vector3(0, -1, 0), out raycastHit)) {
+        //        //Debug.DrawRay(new Vector3(chunk.chunkPosition.x + point.x, 200, chunk.chunkPosition.y + point.y), new Vector3(0, -1, 0));
+
+        //        // If it collides with a terrainChunk
+        //        if (raycastHit.transform.name.Contains("TerrainChunk"))
+        //        {
+        //            TreeTypes treeTypeToSpawn = TreeTypes.Low;
+        //            if(raycastHit.point.y < treeLowHeight)
+        //            {
+        //                treeTypeToSpawn = TreeTypes.Low;
+        //            } else if(raycastHit.point.y < treeMidHeight)
+        //            {
+        //                treeTypeToSpawn = TreeTypes.Mid;
+        //            } else
+        //            {
+        //                treeTypeToSpawn = TreeTypes.High;
+        //            }
+
+        //            GameObject newTree = GetTree(treeTypeToSpawn);
+        //            newTree.transform.SetParent(raycastHit.collider.transform);
+        //            newTree.transform.position = raycastHit.point;
+        //            newTree.SetActive(true);
+        //            //GameObject.Instantiate(spawnObjectPrefab, raycastHit.point, Quaternion.identity, raycastHit.collider.transform);
+        //        }
+        //    }
+        //}
+
+        return points;
+    }
+
+    public void ReturnChunkObjectsToPool(TerrainChunk chunk, Transform chunkTransform)
+    {
+        if(!chunk.hasTrees)
         {
             return;
         }
 
-        foreach (Transform trans in mapPreview.meshFilter.transform)
+        chunk.hasTrees = false;
+
+        // Reverse iteration through list because you are removing ojects from the parent terrain
+        for (int i = chunkTransform.childCount - 1; i >= 0; i--)
         {
+            Transform treeTrans = chunkTransform.GetChild(i);
             TreeTypes treeTypeToSpawn = TreeTypes.Low;
 
-            if (trans.position.y < treeLowHeight)
+            if (treeTrans.position.y < treeLowHeight)
             {
                 treeTypeToSpawn = TreeTypes.Low;
             }
-            else if (trans.position.y < treeMidHeight)
+            else if (treeTrans.position.y < treeMidHeight)
             {
                 treeTypeToSpawn = TreeTypes.Mid;
             }
@@ -278,9 +331,7 @@ public class ObjectCreator : MonoBehaviour
             {
                 treeTypeToSpawn = TreeTypes.High;
             }
-            ReturnTreeToPool(trans.gameObject, treeTypeToSpawn);
+            ReturnTreeToPool(treeTrans.gameObject, treeTypeToSpawn);
         }
-
-        chunk.hasObjects = false;
     }
 }

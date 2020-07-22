@@ -75,6 +75,8 @@ public class TerrainGenerator : MonoBehaviour
             foreach (TerrainChunk chunk in visibleTerrainChunks)
             {
                 chunk.UpdateCollisionMesh();
+                chunk.UpdateTreeVisibility();
+                chunk.UpdateNavMeshData();
             }
         }
 
@@ -135,14 +137,9 @@ public class TerrainGenerator : MonoBehaviour
         if(isVisible)
         {
             visibleTerrainChunks.Add(chunk);
-            if(chunk.hasSetCollider)
-            {
-
-            }
         } else
         {
             visibleTerrainChunks.Remove(chunk);
-            objectCreator.ReturnChunkObjectsToPool(chunk);
         }
     }
 }

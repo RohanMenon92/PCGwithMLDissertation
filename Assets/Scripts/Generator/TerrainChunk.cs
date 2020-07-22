@@ -1,26 +1,29 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.AI;
 
 public class TerrainChunk
 {
-    const float colliderGenrationThreshold = 5f;
+    float colliderGenrationThreshold = 194f;
     public event System.Action<TerrainChunk, bool> OnVisibilityChanged;
-    
+
+    public GameObject meshObject;
     public Vector2 coord;
     public Vector2 chunkPosition;
     public Bounds bounds;
 
     public bool hasSetCollider = false;
-    public bool hasObjects = false;
+    public bool hasTrees = false;
+    public bool hasCreatedTrees = false;
 
     Vector2 sampleCenter;
 
-    GameObject meshObject;
     MeshRenderer meshRenderer;
     MeshFilter meshFilter;
     MeshCollider meshCollider;
+    NavMeshSurface navMeshSurface;
 
     // LOD Data
     LODInfo[] detailLevels;
@@ -37,7 +40,7 @@ public class TerrainChunk
     Transform viewer;
     Material meshMaterial;
     ObjectCreator objectCreator;
-
+    List<Vector2> treePoints;
 
     Vector2 viewerPosition
     {
@@ -65,11 +68,14 @@ public class TerrainChunk
         chunkPosition = coord * meshSettings.meshWorldSize;
         bounds = new Bounds(chunkPosition, Vector2.one * meshSettings.meshWorldSize);
 
+        colliderGenrationThreshold = meshSettings.meshWorldSize;
+
         // Create plane
         meshObject = new GameObject("TerrainChunk_" + coord.x + ":" + coord.y);
         meshFilter = meshObject.AddComponent<MeshFilter>();
         meshRenderer = meshObject.AddComponent<MeshRenderer>();
         meshCollider = meshObject.AddComponent<MeshCollider>();
+        navMeshSurface = meshObject.AddComponent<NavMeshSurface>();
 
         meshObject.transform.parent = parent;
         meshObject.transform.position = new Vector3(chunkPosition.x, 0, chunkPosition.y);
@@ -85,6 +91,31 @@ public class TerrainChunk
                 lodMeshes[i].updateCallback += UpdateCollisionMesh;
             }
             lodMeshes[i].updateCallback += UpdateTerrainChunk;
+        }
+    }
+
+    public void UpdateNavMeshData()
+    {
+        //throw new NotImplementedException();
+    }
+
+    public void UpdateTreeVisibility()
+    {
+        if(!hasCreatedTrees)
+        {
+            return;
+        }
+
+        // Show trees if within half the distance of colliderGeneration Threshold or within the terrain mesh
+        bool showTrees = bounds.SqrDistance(viewerPosition) < (colliderGenrationThreshold * colliderGenrationThreshold)/4 || bounds.SqrDistance(viewerPosition) == 0;
+
+        if (showTrees && !hasTrees)
+        {
+            CreateTreesFromStoredPoints();
+        }
+        else if (!showTrees && hasTrees)
+        {
+            objectCreator.ReturnChunkObjectsToPool(this, meshObject.transform);
         }
     }
 
@@ -173,6 +204,12 @@ public class TerrainChunk
     {
         if (hasSetCollider)
         {
+            if (!hasCreatedTrees)
+            {
+                // If has not created trees before, set them and store them
+                treePoints = objectCreator.OnCreateNewTreesForChunk(this);
+            }
+
             return;
         }
 
@@ -186,16 +223,20 @@ public class TerrainChunk
             }
         }
 
-        if (sqrDistnceFromViewerEdge > colliderGenrationThreshold * colliderGenrationThreshold || sqrDistnceFromViewerEdge == 0)
+        if (sqrDistnceFromViewerEdge < colliderGenrationThreshold * colliderGenrationThreshold || sqrDistnceFromViewerEdge == 0)
         {
             if (lodMeshes[colliderLODindex].hasMesh)
             {
                 meshCollider.sharedMesh = lodMeshes[colliderLODindex].mesh;
                 hasSetCollider = true;
-
-                objectCreator.OnCreateTreesForChunk(this);
             }
         }
+    }
+
+    public void CreateTreesFromStoredPoints()
+    {
+        // If has created trees before, set them
+        objectCreator.BuildChunkTreesFromPoints(this, treePoints);
     }
 
     public void SetVisible(bool visible)
