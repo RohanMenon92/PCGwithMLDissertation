@@ -44,15 +44,18 @@ public class TerrainGenerator : MonoBehaviour
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
     List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
 
+    PlayerPlayScript playerPlayScript;
     ObjectCreator objectCreator;
     NavMeshSurface navMeshSurface;
     // Start is called before the first frame update
     void Start()
     {
+        playerPlayScript = FindObjectOfType<PlayerPlayScript>();
         objectCreator = FindObjectOfType<ObjectCreator>();
         navMeshSurface = gameObject.AddComponent<NavMeshSurface>();
         navMeshSurface.collectObjects = CollectObjects.Children;
         navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+        
 
         terrainScale = meshSettings.terrainScale;
 
@@ -138,8 +141,13 @@ public class TerrainGenerator : MonoBehaviour
 
     void OnCreateColliderForChunk(TerrainChunk chunk)
     {
-        // Update the surface because colliders are created for volume modifiers
-        navMeshSurface.BuildNavMesh();
+        if(!playerPlayScript.thirdPersonPlayer)
+        {
+            // Update the surface because colliders are created for volume modifiers now
+            navMeshSurface.BuildNavMesh();
+        }
+
+        chunk.CreateTrees();
     }
 
     void OnTerrainChunkVisibilityChanged(TerrainChunk chunk, bool isVisible)

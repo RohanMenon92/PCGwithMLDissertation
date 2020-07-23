@@ -20,7 +20,6 @@ public class PlayerPlayScript : MonoBehaviour
 
     Camera camera;
     NavMeshAgent navMeshAgent;
-    bool firstChunkLoaded = false;
 
     List<GameObject> pathObjects = new List<GameObject>();
 

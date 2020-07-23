@@ -34,6 +34,9 @@ public class ObjectCreator : MonoBehaviour
     public Transform unusedMidTreesPool;
     public Transform unusedHighTreesPool;
 
+    public Material lowMaterial;
+    public Material midMaterial;
+    public Material highMaterial;
 
     List<Vector2> points;
     MapPreview mapPreview;
@@ -140,20 +143,30 @@ public class ObjectCreator : MonoBehaviour
                     GameObject spawnObjectPrefab = null;
 
                     TreeTypes treeTypeToSpawn = TreeTypes.Low;
+                    Material spawnMaterial = lowMaterial;
+
                     if (raycastHit.point.y < treeLowHeight)
                     {
                         treeTypeToSpawn = TreeTypes.Low;
                         spawnObjectPrefab = lowTrees[UnityEngine.Random.Range(0, lowTrees.Count - 1)];
+                        spawnMaterial = lowMaterial;
                     }
                     else if (raycastHit.point.y < treeMidHeight)
                     {
                         treeTypeToSpawn = TreeTypes.Mid;
                         spawnObjectPrefab = midTrees[UnityEngine.Random.Range(0, midTrees.Count - 1)];
+                        spawnMaterial = midMaterial;
                     }
                     else
                     {
                         treeTypeToSpawn = TreeTypes.High;
                         spawnObjectPrefab = highTrees[UnityEngine.Random.Range(0, highTrees.Count - 1)];
+                        spawnMaterial = highMaterial;
+                    }
+
+                    foreach (Renderer renderer in spawnObjectPrefab.GetComponentsInChildren<Renderer>())
+                    {
+                        renderer.material = spawnMaterial;
                     }
 
                     GameObject.Instantiate(spawnObjectPrefab, raycastHit.point, Quaternion.identity, raycastHit.collider.transform);
@@ -166,24 +179,30 @@ public class ObjectCreator : MonoBehaviour
     public GameObject GetTree(TreeTypes treeLevel)
     {
         GameObject treeObject = null;
-        // Get Tree From pool and return it
-        
+        Material spawnMaterial = lowMaterial;
+
         switch (treeLevel)
         {
-
-            // Get First Child, set parent to gunport (to remove from respective pool)
             case TreeTypes.Low:
                 treeObject = unusedLowTreesPool.GetChild(UnityEngine.Random.Range(0, unusedLowTreesPool.childCount - 1)).gameObject;
+                spawnMaterial = lowMaterial;
                 break;
             case TreeTypes.Mid:
                 treeObject = unusedMidTreesPool.GetChild(UnityEngine.Random.Range(0, unusedMidTreesPool.childCount - 1)).gameObject;
+                spawnMaterial = midMaterial;
                 break;
             case TreeTypes.High:
                 treeObject = unusedHighTreesPool.GetChild(UnityEngine.Random.Range(0, unusedHighTreesPool.childCount - 1)).gameObject;
+                spawnMaterial = highMaterial;
                 break;
         }
 
-        // Return bullet and let GunPort handle how to fire and set initial velocities
+        foreach (Renderer renderer in treeObject.GetComponentsInChildren<Renderer>())
+        {
+            renderer.material = spawnMaterial;
+        }
+
+        // Return tree with proper material attached to it
         return treeObject;
     }
 

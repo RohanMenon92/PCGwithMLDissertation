@@ -114,7 +114,7 @@ public class TerrainChunk
 
         if (showTrees && !hasTrees)
         {
-            CreateTreesFromStoredPoints();
+            CreateTrees();
         }
         else if (!showTrees && hasTrees)
         {
@@ -229,18 +229,18 @@ public class TerrainChunk
                 // Build nav mesh surface when collider has been set
                 //navMeshSurface.BuildNavMesh();
                 hasSetCollider = true;
-                if (!hasCreatedTrees)
-                {
-                    // If has not created trees before, set them and store them
-                    treePoints = objectCreator.OnCreateNewTreesForChunk(this);
-                }
                 OnCreatedCollider.Invoke(this);
             }
         }
     }
 
-    public void CreateTreesFromStoredPoints()
+    public void CreateTrees()
     {
+        if(!hasCreatedTrees)
+        {
+            // If has not created trees before, set them and store them
+            treePoints = objectCreator.OnCreateNewTreesForChunk(this);
+        }
         // If has created trees before, set them
         objectCreator.BuildChunkTreesFromPoints(this, treePoints);
     }
