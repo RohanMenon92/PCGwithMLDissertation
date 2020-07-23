@@ -76,7 +76,6 @@ public class TerrainGenerator : MonoBehaviour
             {
                 chunk.UpdateCollisionMesh();
                 chunk.UpdateTreeVisibility();
-                chunk.UpdateNavMeshData();
             }
         }
 

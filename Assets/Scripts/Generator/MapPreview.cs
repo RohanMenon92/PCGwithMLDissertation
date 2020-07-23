@@ -86,11 +86,14 @@ public class MapPreview : MonoBehaviour
 
     void OnValuesUpdated()
     {
-        // Redraw the map in editor if values are updated
-        if (!Application.isPlaying)
+        UnityEditor.EditorApplication.delayCall += () =>
         {
-            DrawMapInEditor();
-        }
+            // Redraw the map in editor if values are updated
+            if (!Application.isPlaying)
+            {
+                DrawMapInEditor();
+            }
+        };
     }
 
     private void OnValidate()

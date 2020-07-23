@@ -72,13 +72,20 @@ public class TerrainChunk
 
         // Create plane
         meshObject = new GameObject("TerrainChunk_" + coord.x + ":" + coord.y);
+        meshObject.transform.parent = parent;
+        meshObject.transform.position = new Vector3(chunkPosition.x, 0, chunkPosition.y);
+
         meshFilter = meshObject.AddComponent<MeshFilter>();
         meshRenderer = meshObject.AddComponent<MeshRenderer>();
         meshCollider = meshObject.AddComponent<MeshCollider>();
-        navMeshSurface = meshObject.AddComponent<NavMeshSurface>();
 
-        meshObject.transform.parent = parent;
-        meshObject.transform.position = new Vector3(chunkPosition.x, 0, chunkPosition.y);
+
+        navMeshSurface = meshObject.AddComponent<NavMeshSurface>();
+        navMeshSurface.collectObjects = CollectObjects.Volume;
+        navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+        navMeshSurface.center = Vector3.zero;
+        navMeshSurface.size = new Vector3(meshSettings.meshWorldSize, heightMapSettings.maxHeight * 2, meshSettings.meshWorldSize);
+
         SetVisible(false);
 
         // Create LOD meshes for all levels of detail
@@ -92,11 +99,6 @@ public class TerrainChunk
             }
             lodMeshes[i].updateCallback += UpdateTerrainChunk;
         }
-    }
-
-    public void UpdateNavMeshData()
-    {
-        //throw new NotImplementedException();
     }
 
     public void UpdateTreeVisibility()
@@ -228,6 +230,8 @@ public class TerrainChunk
             if (lodMeshes[colliderLODindex].hasMesh)
             {
                 meshCollider.sharedMesh = lodMeshes[colliderLODindex].mesh;
+                // Build nav mesh surface when collider has been set
+                navMeshSurface.BuildNavMesh();
                 hasSetCollider = true;
             }
         }

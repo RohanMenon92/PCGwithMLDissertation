@@ -12,12 +12,22 @@ public class MeshSettings : UpdatableData
     // Chunk Size for regular terrain
     // 241 - 1 = 240 is divisible by a lot more factors than the unity limit for vertex chunk size (255)
     // 239 Because we are adding 2 vertices for the padding
-    public static readonly int[] supportedMeshSizes = { 48, 72, 96, 120, 144, 168, 192, 216, 240 };
 
     // Minimum Chunk size for flat shading
     // 96 - 1 = 95 is not divisible by 5,  
     // limit for vertex chunk size (255) but we create a lot more vertexes when using flat shading(each triangle is independent)
-    //public static readonly int[] supportedFlatShadedMeshSizes = { 48, 72, 96 };
+
+    public static readonly int[] supportedMeshSizes = { 48, 72, 96, 120, 144, 168, 192, 216, 240 };
+
+    //[Header("Nav Mesh Parameters")]
+    //[Min(0.05f)]
+    //public float navAgentRadius;
+    //[Min(0.05f)]
+    //public float navAgentHeight;
+    //[Range(0, 60)]
+    //public float navMaxSlope;
+    //[Min(0.05f)]
+    //public float navStepHeight;
 
     public float terrainScale = 1f;
     public bool useFlatShading;
