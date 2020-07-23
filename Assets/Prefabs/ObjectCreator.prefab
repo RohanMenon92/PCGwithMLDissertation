@@ -104,16 +104,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a69cce2281146747a3b59238be57a1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 2
-  regionSize: {x: 20, y: 20}
-  rejectionSamples: 200
+  radius: 1.5
+  regionSize: {x: 30, y: 30}
+  rejectionSamples: 300
   displayRadius: 0.5
-  treesPoolSize: 50
-  treeLowHeight: 5
+  fillPercent: 0.9
+  treesPoolSize: 400
+  treeLowHeight: 4
   treeMidHeight: 10
-  lowTrees: []
-  midTrees: []
-  highTrees: []
+  lowTrees:
+  - {fileID: 174854, guid: 3fd9507fb16d56044bcf520c1d14427c, type: 3}
+  - {fileID: 118422, guid: 107cc8771223daf48be99527559937ff, type: 3}
+  - {fileID: 176278, guid: 3c74caa0496b18d4ba0a1009ebb4c992, type: 3}
+  midTrees:
+  - {fileID: 176282, guid: ac00d368a6864c04791bc85c5567bd51, type: 3}
+  - {fileID: 136328, guid: 613b4cc8c589ad8458e792ae21891bef, type: 3}
+  - {fileID: 114672, guid: 98653de49a7044442972e6997c40db16, type: 3}
+  - {fileID: 127550, guid: 87a6cef862ce2cb4a88c5ca5d5af5d2b, type: 3}
+  - {fileID: 182406, guid: a1d34f7914a1d8148a0ce7262f7ba394, type: 3}
+  highTrees:
+  - {fileID: 142018, guid: d537224908c5f444f86c9e57e0c7234c, type: 3}
+  - {fileID: 182382, guid: 76be61eeff2e7164cb99e1cf8cf0c22b, type: 3}
+  - {fileID: 198980, guid: 55ca4401075700d46a23ae8179a79579, type: 3}
   unusedLowTreesPool: {fileID: 0}
   unusedMidTreesPool: {fileID: 0}
   unusedHighTreesPool: {fileID: 0}
