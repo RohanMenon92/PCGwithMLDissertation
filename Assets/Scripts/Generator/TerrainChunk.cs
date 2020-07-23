@@ -8,6 +8,7 @@ public class TerrainChunk
 {
     float colliderGenrationThreshold = 194f;
     public event System.Action<TerrainChunk, bool> OnVisibilityChanged;
+    public event System.Action<TerrainChunk> OnCreatedCollider;
 
     public GameObject meshObject;
     public Vector2 coord;
@@ -23,7 +24,7 @@ public class TerrainChunk
     MeshRenderer meshRenderer;
     MeshFilter meshFilter;
     MeshCollider meshCollider;
-    NavMeshSurface navMeshSurface;
+    NavMeshModifierVolume navMeshModifier;
 
     // LOD Data
     LODInfo[] detailLevels;
@@ -80,12 +81,11 @@ public class TerrainChunk
         meshCollider = meshObject.AddComponent<MeshCollider>();
 
 
-        navMeshSurface = meshObject.AddComponent<NavMeshSurface>();
-        navMeshSurface.collectObjects = CollectObjects.Volume;
-        navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
-        navMeshSurface.center = Vector3.zero;
-        navMeshSurface.size = new Vector3(meshSettings.meshWorldSize, heightMapSettings.maxHeight * 2, meshSettings.meshWorldSize);
-
+        navMeshModifier = meshObject.AddComponent<NavMeshModifierVolume>();
+        //navMeshSurface.collectObjects = CollectObjects.Volume;
+        //navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+        navMeshModifier.center = Vector3.zero;
+        navMeshModifier.size = new Vector3(meshSettings.meshWorldSize * 1.1f, heightMapSettings.maxHeight * 2, meshSettings.meshWorldSize * 1.1f);
         SetVisible(false);
 
         // Create LOD meshes for all levels of detail
@@ -96,6 +96,7 @@ public class TerrainChunk
             if (i == colliderLODindex)
             {
                 lodMeshes[i].updateCallback += UpdateCollisionMesh;
+                lodMeshes[i].updateCallback += UpdateTreeVisibility;
             }
             lodMeshes[i].updateCallback += UpdateTerrainChunk;
         }
@@ -141,6 +142,7 @@ public class TerrainChunk
         meshRenderer.material.SetFloat("_Smoothness", 0f);
 
         UpdateTerrainChunk();
+        UpdateCollisionMesh();
         //print("Map Data received");
         //mapGen.RequestMeshData(mapData, OnMeshDataReceived);
     }
@@ -206,12 +208,6 @@ public class TerrainChunk
     {
         if (hasSetCollider)
         {
-            if (!hasCreatedTrees)
-            {
-                // If has not created trees before, set them and store them
-                treePoints = objectCreator.OnCreateNewTreesForChunk(this);
-            }
-
             return;
         }
 
@@ -231,8 +227,14 @@ public class TerrainChunk
             {
                 meshCollider.sharedMesh = lodMeshes[colliderLODindex].mesh;
                 // Build nav mesh surface when collider has been set
-                navMeshSurface.BuildNavMesh();
+                //navMeshSurface.BuildNavMesh();
                 hasSetCollider = true;
+                if (!hasCreatedTrees)
+                {
+                    // If has not created trees before, set them and store them
+                    treePoints = objectCreator.OnCreateNewTreesForChunk(this);
+                }
+                OnCreatedCollider.Invoke(this);
             }
         }
     }

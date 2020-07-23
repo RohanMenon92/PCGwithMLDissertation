@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DefaultHeightMapSetting
   m_EditorClassIdentifier: 
   autoUpdate: 1
-  heightMultiplier: 80
+  heightMultiplier: 60
   heightCurve:
     serializedVersion: 2
     m_Curve:
@@ -45,8 +45,8 @@ MonoBehaviour:
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.48728156
-      value: 0.37165207
+      time: 0.5706149
+      value: 0.3622403
       inSlope: 0.9594579
       outSlope: 0.9594579
       tangentMode: 0
@@ -54,8 +54,8 @@ MonoBehaviour:
       inWeight: 0.22857855
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.6474087
-      value: 0.46869415
+      time: 0.7638109
+      value: 0.4592824
       inSlope: 0.3650047
       outSlope: 0.3650047
       tangentMode: 0
@@ -63,8 +63,8 @@ MonoBehaviour:
       inWeight: 0.34342656
       outWeight: 0.32271412
     - serializedVersion: 3
-      time: 0.8948604
-      value: 0.6892112
+      time: 0.93586564
+      value: 0.6656818
       inSlope: 2.9370673
       outSlope: 2.9370673
       tangentMode: 0
@@ -111,9 +111,9 @@ MonoBehaviour:
   noiseSettings:
     normalizeMode: 1
     noiseEstimatorVariable: 1.3
-    scale: 40
-    octaves: 8
-    persistence: 0.35
-    lacunarity: 2
+    scale: 60
+    octaves: 10
+    persistence: 0.373
+    lacunarity: 3
     seed: 0
-    offset: {x: 0, y: 0}
+    offset: {x: 10, y: 10}

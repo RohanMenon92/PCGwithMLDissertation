@@ -9,13 +9,20 @@ public class PlayerPlayScript : MonoBehaviour
 {
     public bool thirdPersonPlayer;
 
-    public float noPathFOV = 90f;
-    public float noPathFOVGain = 0.1f;
+    public float noPathFOV = 120f;
+    public float noPathFOVGain = 0.2f;
 
     public Transform aimTarget;
+    public Transform aimAgent;
+
+    public GameObject inCompletePathPrefab;
+    public GameObject completePathPrefab;
 
     Camera camera;
     NavMeshAgent navMeshAgent;
+    bool firstChunkLoaded = false;
+
+    List<GameObject> pathObjects = new List<GameObject>();
 
     // Start is called before the first frame update
     void Start()
@@ -26,8 +33,10 @@ public class PlayerPlayScript : MonoBehaviour
         // Set Which kind of control is enabled
         navMeshAgent.enabled = !thirdPersonPlayer;
         this.GetComponent<vThirdPersonInput>().enabled = thirdPersonPlayer;
+        this.GetComponent<Rigidbody>().useGravity = thirdPersonPlayer;
 
         aimTarget.gameObject.SetActive(!thirdPersonPlayer);
+        aimAgent.gameObject.SetActive(!thirdPersonPlayer);
         camera.GetComponent<vThirdPersonCamera>().defaultDistance = thirdPersonPlayer ? 5 : 20;
         camera.GetComponent<vThirdPersonCamera>().height = thirdPersonPlayer ? 2 : 40;
 
@@ -35,8 +44,10 @@ public class PlayerPlayScript : MonoBehaviour
         {
             camera.GetComponent<vThirdPersonCamera>().enabled = false;
             camera.transform.SetParent(transform);
-            camera.transform.position += new Vector3(0f, 40f, 0f);
-            navMeshAgent.Warp(Vector3.one);
+            camera.transform.position = new Vector3(0f, 80f, -10f);
+            aimAgent.SetParent(transform);
+            aimAgent.localPosition = new Vector3(0f, 5f, 0f);
+            navMeshAgent.Warp(new Vector3(0f, 10f, 0f));
         }
     }
 
@@ -53,12 +64,14 @@ public class PlayerPlayScript : MonoBehaviour
             return;
         }
 
-        if(!navMeshAgent.hasPath)
+        //  haspath is not very reliable, better to check if the remaining distance is below a certain threshold
+        if(!navMeshAgent.hasPath || navMeshAgent.remainingDistance < 0.2f)
         {
-            if(aimTarget.gameObject.activeSelf)
-            {
-                aimTarget.gameObject.SetActive(false);
-            }
+            //if(pathObjects.Count > 0)
+            //{
+            //    ClearPathObjects();
+            //}
+
             camera.transform.LookAt(transform);
             if(camera.fieldOfView < noPathFOV)
             {
@@ -68,7 +81,8 @@ public class PlayerPlayScript : MonoBehaviour
         {
             camera.transform.LookAt((transform.position + navMeshAgent.destination)/2);
 
-            camera.fieldOfView = Vector3.Distance(transform.position, navMeshAgent.destination) + 2;
+            float navMeshAgentDistance = Vector3.Distance(transform.position, navMeshAgent.destination);
+            camera.fieldOfView = navMeshAgentDistance < 90 ? navMeshAgentDistance + 10 : 90;
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -82,14 +96,68 @@ public class PlayerPlayScript : MonoBehaviour
 
                 if (hit.transform.name.Contains("TerrainChunk"))
                 {
-                    if (!aimTarget.gameObject.activeSelf)
-                    {
-                        aimTarget.gameObject.SetActive(true);
-                    }
-                    navMeshAgent.SetDestination(hit.point);
-                    aimTarget.position = navMeshAgent.destination;
+                    MoveAgentTo(hit.point);
                 }
             }
+        }
+    }
+
+    private void ClearPathObjects()
+    {
+        // Pooling?
+        // Reverse iterate for removal
+        for (int i = pathObjects.Count - 1; i >= 0; i--)
+        {
+            GameObject removedObject = pathObjects[i];
+            GameObject.Destroy(removedObject);
+        }
+        pathObjects.Clear();
+    }
+
+    private void MoveAgentTo(Vector3 point)
+    {
+        ClearPathObjects();
+
+        if (!aimAgent.gameObject.activeSelf)
+        {
+            aimAgent.gameObject.SetActive(true);
+        }
+
+        NavMeshPath path = new NavMeshPath();
+        navMeshAgent.CalculatePath(point, path);
+        if (path.status == NavMeshPathStatus.PathComplete)
+        {
+            Debug.Log("PATH IS POSSIBLE!!!! :) ");
+
+            navMeshAgent.SetDestination(point);
+            if (!aimTarget.gameObject.activeSelf)
+            {
+                aimTarget.gameObject.SetActive(true);
+            }
+            aimTarget.position = point;
+
+            foreach (Vector3 pathPoint in path.corners)
+            {
+                // Pooling?
+                GameObject pathObject = GameObject.Instantiate(completePathPrefab);
+                pathObject.transform.position = pathPoint;
+                pathObjects.Add(pathObject);
+            }
+        }
+        else if (path.status == NavMeshPathStatus.PathPartial)
+        {
+            Debug.Log("ONLY PARTIAL PATH IS POSSIBLE... :( ");
+            foreach (Vector3 pathPoint in path.corners)
+            {
+                // Pooling?
+                GameObject pathObject = GameObject.Instantiate(inCompletePathPrefab);
+                pathObject.transform.position = pathPoint;
+                pathObjects.Add(pathObject);
+            }
+        }
+        else if (path.status == NavMeshPathStatus.PathPartial)
+        {
+            Debug.Log("NO PATH POSSIBLE... :( ");
         }
     }
 }

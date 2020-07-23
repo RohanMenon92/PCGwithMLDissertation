@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.AI;
 
 [System.Serializable]
 public struct LODInfo
@@ -45,11 +45,14 @@ public class TerrainGenerator : MonoBehaviour
     List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
 
     ObjectCreator objectCreator;
-
+    NavMeshSurface navMeshSurface;
     // Start is called before the first frame update
     void Start()
     {
         objectCreator = FindObjectOfType<ObjectCreator>();
+        navMeshSurface = gameObject.AddComponent<NavMeshSurface>();
+        navMeshSurface.collectObjects = CollectObjects.Children;
+        navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
 
         terrainScale = meshSettings.terrainScale;
 
@@ -123,6 +126,8 @@ public class TerrainGenerator : MonoBehaviour
                         // Add new terrain chunk and parent it to this transform
                         terrainChunkDictionary.Add(viewedChunkCoord, newChunk);
                         newChunk.OnVisibilityChanged += OnTerrainChunkVisibilityChanged;
+                        newChunk.OnCreatedCollider += OnCreateColliderForChunk;
+
                         // subscribe to visibility changed before load
                         newChunk.Load();
                     }
@@ -131,9 +136,15 @@ public class TerrainGenerator : MonoBehaviour
         }
     }
 
+    void OnCreateColliderForChunk(TerrainChunk chunk)
+    {
+        // Update the surface because colliders are created for volume modifiers
+        navMeshSurface.BuildNavMesh();
+    }
+
     void OnTerrainChunkVisibilityChanged(TerrainChunk chunk, bool isVisible)
     {
-        if(isVisible)
+        if (isVisible)
         {
             visibleTerrainChunks.Add(chunk);
         } else

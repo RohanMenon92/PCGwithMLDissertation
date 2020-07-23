@@ -270,38 +270,6 @@ public class ObjectCreator : MonoBehaviour
 
         points = PoissonDiscSampling.GeneratePoints(radius, regionSize, rejectionSamples);
 
-        //foreach(Vector2 point in points)
-        //{
-        //    RaycastHit raycastHit;
-        //    // Fire a ray going down
-        //    // multiply by 0.45f to allow some buffer space between chunks
-        //    if (Physics.Raycast(new Vector3((chunk.chunkPosition.x - chunk.bounds.size.x * 0.45f) + (point.x * newSizeX), 200, (chunk.chunkPosition.y - chunk.bounds.size.y * 0.45f) + (point.y * newSizeY)), new Vector3(0, -1, 0), out raycastHit)) {
-        //        //Debug.DrawRay(new Vector3(chunk.chunkPosition.x + point.x, 200, chunk.chunkPosition.y + point.y), new Vector3(0, -1, 0));
-
-        //        // If it collides with a terrainChunk
-        //        if (raycastHit.transform.name.Contains("TerrainChunk"))
-        //        {
-        //            TreeTypes treeTypeToSpawn = TreeTypes.Low;
-        //            if(raycastHit.point.y < treeLowHeight)
-        //            {
-        //                treeTypeToSpawn = TreeTypes.Low;
-        //            } else if(raycastHit.point.y < treeMidHeight)
-        //            {
-        //                treeTypeToSpawn = TreeTypes.Mid;
-        //            } else
-        //            {
-        //                treeTypeToSpawn = TreeTypes.High;
-        //            }
-
-        //            GameObject newTree = GetTree(treeTypeToSpawn);
-        //            newTree.transform.SetParent(raycastHit.collider.transform);
-        //            newTree.transform.position = raycastHit.point;
-        //            newTree.SetActive(true);
-        //            //GameObject.Instantiate(spawnObjectPrefab, raycastHit.point, Quaternion.identity, raycastHit.collider.transform);
-        //        }
-        //    }
-        //}
-
         return points;
     }
 
