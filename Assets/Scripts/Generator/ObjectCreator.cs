@@ -84,13 +84,12 @@ public class ObjectCreator : MonoBehaviour
 
     public void OnDrawGizmos()
     {
-        Gizmos.DrawWireCube(regionSize / 2, regionSize);
-        Gizmos.DrawWireCube(Vector3.zero, new Vector3(regionSize.x, 0, regionSize.y));
+        Gizmos.DrawWireCube(transform.position, new Vector3(regionSize.x, 0, regionSize.y));
         if (points != null)
         {
             foreach (Vector2 point in points)
             {
-                Gizmos.DrawSphere(point, displayRadius);
+                Gizmos.DrawSphere(transform.position + new Vector3(point.x, 0, point.y) - new Vector3(regionSize.x/2, 0, regionSize.y/2), displayRadius);
             }
         }
     }
