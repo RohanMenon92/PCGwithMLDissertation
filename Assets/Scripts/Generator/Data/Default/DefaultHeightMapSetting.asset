@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DefaultHeightMapSetting
   m_EditorClassIdentifier: 
   autoUpdate: 1
-  heightMultiplier: 50
+  heightMultiplier: 80
   heightCurve:
     serializedVersion: 2
     m_Curve:
