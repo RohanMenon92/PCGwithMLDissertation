@@ -36,10 +36,19 @@ public class TerrainGenerator : MonoBehaviour
     public Transform viewer;
     public Material terrainMaterial;
 
+    [Header("Chunk Collider Statistics (For Machine Learning)")]
+    // ML STUFF: Calculate statistics for generated chunk colliders, if they are below a certain threshold, abandon generation
+    public int chunkCollidersMade; //  chunks generated
+    public float totNormalX; // To calculate Average X Normal 
+    public float totNormalY; // To calculate Average Y Normal 
+    public float totNormalZ; // To calculate Average Z Normal 
+    public float totValidSlope; // To calculate Average valid slope
+
     Vector2 viewerPosition;
     Vector2 lastUpdateViewerPosition;
     int chunksVisibleInViewDst;
     float meshWorldSize;
+
 
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
     List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
@@ -50,12 +59,17 @@ public class TerrainGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        chunkCollidersMade = 0;
+        totNormalX = 0;
+        totNormalY = 0;
+        totNormalZ = 0;
+        totValidSlope = 0;
+
         playerPlayScript = FindObjectOfType<PlayerPlayScript>();
         objectCreator = FindObjectOfType<ObjectCreator>();
         navMeshSurface = gameObject.AddComponent<NavMeshSurface>();
         navMeshSurface.collectObjects = CollectObjects.Children;
         navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
-        
 
         terrainScale = meshSettings.terrainScale;
 
@@ -146,6 +160,13 @@ public class TerrainGenerator : MonoBehaviour
             // Update the surface because colliders are created for volume modifiers now
             navMeshSurface.BuildNavMesh();
         }
+
+        // TODO: Create a function that returns these values
+        chunkCollidersMade++;
+        totNormalX += chunk.averageXNormal;
+        totNormalY += chunk.averageYNormal;
+        totNormalZ += chunk.averageZNormal;
+        totValidSlope += chunk.averageValidSlope;
 
         chunk.CreateTrees();
     }

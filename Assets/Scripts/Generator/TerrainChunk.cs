@@ -19,6 +19,15 @@ public class TerrainChunk
     public bool hasTrees = false;
     public bool hasCreatedTrees = false;
 
+    // ML STUFF: Use this for noise generation analysis (TODO :: Should also check if the terrain generation is taking into account water vertices?)
+    // Average Y should be at least greater than 4.5 (For navigable terrain)
+    // Average X and Z should be greater than 1.5 (otherwise terrain is too flat) but preferably less than 2.5 (otherwise terrain is not navigable)
+    // Average valid slope should be at least half of the generated terrain for interesting navigable meshes
+    public float averageYNormal;
+    public float averageXNormal;
+    public float averageZNormal;
+    public float averageValidSlope;
+
     Vector2 sampleCenter;
 
     MeshRenderer meshRenderer;
@@ -79,7 +88,6 @@ public class TerrainChunk
         meshFilter = meshObject.AddComponent<MeshFilter>();
         meshRenderer = meshObject.AddComponent<MeshRenderer>();
         meshCollider = meshObject.AddComponent<MeshCollider>();
-
 
         navMeshModifier = meshObject.AddComponent<NavMeshModifierVolume>();
         //navMeshSurface.collectObjects = CollectObjects.Volume;
@@ -226,8 +234,24 @@ public class TerrainChunk
             if (lodMeshes[colliderLODindex].hasMesh)
             {
                 meshCollider.sharedMesh = lodMeshes[colliderLODindex].mesh;
-                // Build nav mesh surface when collider has been set
-                //navMeshSurface.BuildNavMesh();
+
+                averageYNormal = 0f;
+                // Calculate data for ML statistics
+                foreach (Vector3 meshNormal in meshCollider.sharedMesh.normals)
+                {
+                    averageYNormal += Math.Abs(meshNormal.y);
+                    averageXNormal += Math.Abs(meshNormal.x);
+                    averageZNormal += Math.Abs(meshNormal.z);
+                    // If slope is less than 45 degrees
+                    if(Vector3.Angle(meshNormal, Vector3.up) < 45)
+                    {
+                        averageValidSlope += 1;
+                    }
+                }
+                averageYNormal = averageYNormal / meshCollider.sharedMesh.normals.Length;
+                averageXNormal = averageXNormal / meshCollider.sharedMesh.normals.Length;
+                averageZNormal = averageZNormal / meshCollider.sharedMesh.normals.Length;
+                averageValidSlope = averageValidSlope / meshCollider.sharedMesh.normals.Length;
                 hasSetCollider = true;
                 OnCreatedCollider.Invoke(this);
             }
@@ -263,7 +287,6 @@ class LODMesh
     public bool hasMesh;
     int lod;
     public event System.Action updateCallback;
-
 
     public LODMesh(int lod)
     {

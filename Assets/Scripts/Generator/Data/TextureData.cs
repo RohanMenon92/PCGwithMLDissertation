@@ -11,7 +11,7 @@ public class TextureData : UpdatableData
     //}
     public void UpdateMeshHeights(Material material, float minHeight, float maxHeight)
     {
-        Debug.Log("Update Mesh Height : " + minHeight + " : " + maxHeight);
+        //Debug.Log("Update Mesh Height : " + minHeight + " : " + maxHeight);
         material.SetFloat("MinHeight", minHeight);
         material.SetFloat("MaxHeight", maxHeight);
     }
