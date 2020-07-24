@@ -19,6 +19,7 @@ public class ObjectCreator : MonoBehaviour
     public float displayRadius = 1;
     [Range(0, 1)]
     public float fillPercent = 0.9f;
+    public Vector2 offset = Vector2.zero;
 
     [Header("Tree Data")]
     public int treesPoolSize = 50;
@@ -41,29 +42,7 @@ public class ObjectCreator : MonoBehaviour
     List<Vector2> points;
     MapPreview mapPreview;
 
-    void Start()
-    {
-        for (int i = 0; i <= treesPoolSize; i++)
-        {
-            foreach (GameObject lowPrefab in lowTrees)
-            {
-                GameObject newTree = Instantiate(lowPrefab, unusedLowTreesPool);
-                newTree.SetActive(false);
-            }
-            foreach (GameObject midPrefab in midTrees)
-            {
-                GameObject newTree = Instantiate(midPrefab, unusedMidTreesPool);
-                newTree.SetActive(false);
-            }
-            foreach (GameObject highPrefab in highTrees)
-            {
-                GameObject newTree = Instantiate(highPrefab, unusedHighTreesPool);
-                newTree.SetActive(false);
-            }
-        }
-
-    }
-
+#if UNITY_EDITOR
     private void OnValidate()
     {
         RegeneratePoints();
@@ -82,11 +61,6 @@ public class ObjectCreator : MonoBehaviour
         }
     }
 
-    private void RegeneratePoints()
-    {
-        points = PoissonDiscSampling.GeneratePoints(radius, regionSize, rejectionSamples);
-    }
-
     public void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position, new Vector3(regionSize.x, 0, regionSize.y));
@@ -94,12 +68,11 @@ public class ObjectCreator : MonoBehaviour
         {
             foreach (Vector2 point in points)
             {
-                Gizmos.DrawSphere(transform.position + (new Vector3(point.x, 0, point.y) - new Vector3(regionSize.x/2, 0, regionSize.y/2)) * fillPercent, displayRadius);
+                Gizmos.DrawSphere(transform.position + new Vector3(offset.x, 0, offset.y) + (new Vector3(point.x, 0, point.y) - new Vector3(regionSize.x / 2, 0, regionSize.y / 2)) * fillPercent, displayRadius);
             }
         }
     }
 
-#if UNITY_EDITOR
     public void OnCreateTreesForPreviewChunk()
     {
         if (Application.isPlaying)
@@ -122,7 +95,7 @@ public class ObjectCreator : MonoBehaviour
         float newSizeY = terrainBounds.size.y / regionSize.y;
 
         // Delete Old Objects
-        foreach(Transform trans in mapPreview.meshFilter.transform)
+        foreach (Transform trans in mapPreview.meshFilter.transform)
         {
             GameObject.DestroyImmediate(trans.gameObject);
         }
@@ -133,7 +106,8 @@ public class ObjectCreator : MonoBehaviour
             RaycastHit raycastHit;
             // Fire a ray going down
             // multiply by 0.45f to allow some buffer space between chunks
-            if (Physics.Raycast((mapPreview.meshFilter.transform.position + (new Vector3(point.x * newSizeX, 200, point.y * newSizeY) - new Vector3(terrainBounds.size.x/2, 0, terrainBounds.size.y/2)) * fillPercent), new Vector3(0, -1, 0), out raycastHit))
+            if (Physics.Raycast((mapPreview.meshFilter.transform.position + new Vector3(offset.x * newSizeX, 0, offset.y * newSizeY)
+                + (new Vector3(point.x * newSizeX, 200, point.y * newSizeY) - new Vector3(terrainBounds.size.x / 2, 0, terrainBounds.size.y / 2)) * fillPercent), new Vector3(0, -1, 0), out raycastHit))
             {
                 //Debug.DrawRay(new Vector3(chunk.chunkPosition.x + point.x, 200, chunk.chunkPosition.y + point.y), new Vector3(0, -1, 0));
 
@@ -175,6 +149,35 @@ public class ObjectCreator : MonoBehaviour
         }
     }
 #endif
+
+
+    void Start()
+    {
+        for (int i = 0; i <= treesPoolSize; i++)
+        {
+            foreach (GameObject lowPrefab in lowTrees)
+            {
+                GameObject newTree = Instantiate(lowPrefab, unusedLowTreesPool);
+                newTree.SetActive(false);
+            }
+            foreach (GameObject midPrefab in midTrees)
+            {
+                GameObject newTree = Instantiate(midPrefab, unusedMidTreesPool);
+                newTree.SetActive(false);
+            }
+            foreach (GameObject highPrefab in highTrees)
+            {
+                GameObject newTree = Instantiate(highPrefab, unusedHighTreesPool);
+                newTree.SetActive(false);
+            }
+        }
+
+    }
+
+    private void RegeneratePoints()
+    {
+        points = PoissonDiscSampling.GeneratePoints(radius, regionSize, rejectionSamples);
+    }
 
     public GameObject GetTree(TreeTypes treeLevel)
     {
@@ -243,7 +246,8 @@ public class ObjectCreator : MonoBehaviour
             RaycastHit raycastHit;
             // Fire a ray going down
             // multiply by 0.45f to allow some buffer space between chunks
-            if (Physics.Raycast((new Vector3(chunk.chunkPosition.x, 0f, chunk.chunkPosition.y) + (new Vector3(point.x * newSizeX, 200, point.y * newSizeY) - new Vector3(chunk.bounds.size.x / 2, 0, chunk.bounds.size.y / 2)) * fillPercent), new Vector3(0, -1, 0), out raycastHit))
+            if (Physics.Raycast((new Vector3(chunk.chunkPosition.x, 0f, chunk.chunkPosition.y) + new Vector3(offset.x * newSizeX, 0, offset.y * newSizeY)
+                + (new Vector3(point.x * newSizeX, 200, point.y * newSizeY) - new Vector3(chunk.bounds.size.x / 2, 0, chunk.bounds.size.y / 2)) * fillPercent), new Vector3(0, -1, 0), out raycastHit))
             {
                 //Debug.DrawRay(new Vector3(chunk.chunkPosition.x + point.x, 200, chunk.chunkPosition.y + point.y), new Vector3(0, -1, 0));
 

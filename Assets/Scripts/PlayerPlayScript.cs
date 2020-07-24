@@ -124,39 +124,40 @@ public class PlayerPlayScript : MonoBehaviour
 
         NavMeshPath path = new NavMeshPath();
         navMeshAgent.CalculatePath(point, path);
-        if (path.status == NavMeshPathStatus.PathComplete)
-        {
-            Debug.Log("PATH IS POSSIBLE!!!! :) ");
 
-            navMeshAgent.SetDestination(point);
-            if (!aimTarget.gameObject.activeSelf)
-            {
-                aimTarget.gameObject.SetActive(true);
-            }
-            aimTarget.position = point;
+        switch(path.status)
+        {
+            case NavMeshPathStatus.PathComplete:
+                Debug.Log("PATH IS POSSIBLE!!!! :) ");
 
-            foreach (Vector3 pathPoint in path.corners)
-            {
-                // Pooling?
-                GameObject pathObject = GameObject.Instantiate(completePathPrefab);
-                pathObject.transform.position = pathPoint;
-                pathObjects.Add(pathObject);
-            }
-        }
-        else if (path.status == NavMeshPathStatus.PathPartial)
-        {
-            Debug.Log("ONLY PARTIAL PATH IS POSSIBLE... :( ");
-            foreach (Vector3 pathPoint in path.corners)
-            {
-                // Pooling?
-                GameObject pathObject = GameObject.Instantiate(inCompletePathPrefab);
-                pathObject.transform.position = pathPoint;
-                pathObjects.Add(pathObject);
-            }
-        }
-        else if (path.status == NavMeshPathStatus.PathPartial)
-        {
-            Debug.Log("NO PATH POSSIBLE... :( ");
+                navMeshAgent.SetDestination(point);
+                if (!aimTarget.gameObject.activeSelf)
+                {
+                    aimTarget.gameObject.SetActive(true);
+                }
+                aimTarget.position = point;
+
+                foreach (Vector3 pathPoint in path.corners)
+                {
+                    // Pooling?
+                    GameObject pathObject = GameObject.Instantiate(completePathPrefab);
+                    pathObject.transform.position = pathPoint;
+                    pathObjects.Add(pathObject);
+                }
+                break;
+            case NavMeshPathStatus.PathPartial:
+                Debug.Log("ONLY PARTIAL PATH IS POSSIBLE... :( ");
+                foreach (Vector3 pathPoint in path.corners)
+                {
+                    // Pooling?
+                    GameObject pathObject = GameObject.Instantiate(inCompletePathPrefab);
+                    pathObject.transform.position = pathPoint;
+                    pathObjects.Add(pathObject);
+                }
+                break;
+            case NavMeshPathStatus.PathInvalid:
+                Debug.Log("NO PATH POSSIBLE... :( ");
+                break;
         }
     }
 }

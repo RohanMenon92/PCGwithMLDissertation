@@ -110,8 +110,8 @@ MonoBehaviour:
   displayRadius: 0.5
   fillPercent: 0.9
   treesPoolSize: 400
-  treeLowHeight: 4
-  treeMidHeight: 10
+  treeLowHeight: 6
+  treeMidHeight: 12
   lowTrees:
   - {fileID: 174854, guid: 3fd9507fb16d56044bcf520c1d14427c, type: 3}
   - {fileID: 118422, guid: 107cc8771223daf48be99527559937ff, type: 3}
@@ -129,6 +129,9 @@ MonoBehaviour:
   unusedLowTreesPool: {fileID: 0}
   unusedMidTreesPool: {fileID: 0}
   unusedHighTreesPool: {fileID: 0}
+  lowMaterial: {fileID: 2100000, guid: 894583d895d58b444b8e8b67169bd2a4, type: 2}
+  midMaterial: {fileID: 2100000, guid: fe3e3b8ebc1a32647b48b7ea88f534a8, type: 2}
+  highMaterial: {fileID: 2100000, guid: a62e8da5194101042a4d89028ef6f912, type: 2}
 --- !u!1 &6804961749910917546
 GameObject:
   m_ObjectHideFlags: 0

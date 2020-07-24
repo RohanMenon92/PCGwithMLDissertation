@@ -41,6 +41,7 @@ public class MapPreview : MonoBehaviour
         meshRednerer.gameObject.SetActive(false);
     }
 
+#if UNITY_EDITOR
     public void DrawTexture(Texture2D texture)
     {
         textureRender.sharedMaterial.mainTexture = texture;
@@ -65,6 +66,18 @@ public class MapPreview : MonoBehaviour
         }
     }
 
+    void OnValuesUpdated()
+    {
+        UnityEditor.EditorApplication.delayCall += () =>
+        {
+            // Redraw the map in editor if values are updated
+            if (!Application.isPlaying)
+            {
+                DrawMapInEditor();
+            }
+        };
+    }
+
     public void ShowTexturePreview()
     {
         if (!textureRender.gameObject.activeSelf)
@@ -81,19 +94,6 @@ public class MapPreview : MonoBehaviour
             meshRednerer.gameObject.SetActive(true);
             textureRender.gameObject.SetActive(false);
         }
-    }
-
-
-    void OnValuesUpdated()
-    {
-        UnityEditor.EditorApplication.delayCall += () =>
-        {
-            // Redraw the map in editor if values are updated
-            if (!Application.isPlaying)
-            {
-                DrawMapInEditor();
-            }
-        };
     }
 
     private void OnValidate()
@@ -136,4 +136,5 @@ public class MapPreview : MonoBehaviour
 
         textureData.UpdateMeshHeights(terrainMaterial, heightMapSettings.minHeight, heightMapSettings.maxHeight);
     }
+#endif
 }
