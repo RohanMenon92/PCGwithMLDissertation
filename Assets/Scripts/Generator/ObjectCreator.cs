@@ -24,8 +24,10 @@ public class ObjectCreator : MonoBehaviour
     [Header("Tree Data")]
     public int treesPoolSize = 50;
 
-    public float treeLowHeight = 5;
-    public float treeMidHeight = 10;
+    [Range(0, 1)]
+    public float treeLowHeight = 0.3f;
+    [Range(0, 1)]
+    public float treeMidHeight = 0.7f;
 
     public List<GameObject> lowTrees;
     public List<GameObject> midTrees;
@@ -41,6 +43,8 @@ public class ObjectCreator : MonoBehaviour
 
     List<Vector2> points;
     MapPreview mapPreview;
+    TerrainGenerator terrainGen;
+
 
 #if UNITY_EDITOR
     private void OnValidate()
@@ -107,7 +111,7 @@ public class ObjectCreator : MonoBehaviour
             // Fire a ray going down
             // multiply by 0.45f to allow some buffer space between chunks
             if (Physics.Raycast((mapPreview.meshFilter.transform.position + new Vector3(offset.x * newSizeX, 0, offset.y * newSizeY)
-                + (new Vector3(point.x * newSizeX, 200, point.y * newSizeY) - new Vector3(terrainBounds.size.x / 2, 0, terrainBounds.size.y / 2)) * fillPercent), new Vector3(0, -1, 0), out raycastHit))
+                + (new Vector3(point.x * newSizeX, mapPreview.meshFilter.transform.position.y + 300, point.y * newSizeY) - new Vector3(terrainBounds.size.x / 2, 0, terrainBounds.size.y / 2)) * fillPercent), new Vector3(0, -1, 0), out raycastHit))
             {
                 //Debug.DrawRay(new Vector3(chunk.chunkPosition.x + point.x, 200, chunk.chunkPosition.y + point.y), new Vector3(0, -1, 0));
 
@@ -119,13 +123,13 @@ public class ObjectCreator : MonoBehaviour
                     TreeTypes treeTypeToSpawn = TreeTypes.Low;
                     Material spawnMaterial = lowMaterial;
 
-                    if (raycastHit.point.y < treeLowHeight)
+                    if (raycastHit.point.y < mapPreview.heightMapSettings.maxHeight * treeLowHeight)
                     {
                         treeTypeToSpawn = TreeTypes.Low;
                         spawnObjectPrefab = lowTrees[UnityEngine.Random.Range(0, lowTrees.Count - 1)];
                         spawnMaterial = lowMaterial;
                     }
-                    else if (raycastHit.point.y < treeMidHeight)
+                    else if (raycastHit.point.y < mapPreview.heightMapSettings.maxHeight * treeMidHeight)
                     {
                         treeTypeToSpawn = TreeTypes.Mid;
                         spawnObjectPrefab = midTrees[UnityEngine.Random.Range(0, midTrees.Count - 1)];
@@ -172,6 +176,7 @@ public class ObjectCreator : MonoBehaviour
             }
         }
 
+        terrainGen = FindObjectOfType<TerrainGenerator>();
     }
 
     private void RegeneratePoints()
@@ -247,7 +252,7 @@ public class ObjectCreator : MonoBehaviour
             // Fire a ray going down
             // multiply by 0.45f to allow some buffer space between chunks
             if (Physics.Raycast((new Vector3(chunk.chunkPosition.x, 0f, chunk.chunkPosition.y) + new Vector3(offset.x * newSizeX, 0, offset.y * newSizeY)
-                + (new Vector3(point.x * newSizeX, 200, point.y * newSizeY) - new Vector3(chunk.bounds.size.x / 2, 0, chunk.bounds.size.y / 2)) * fillPercent), new Vector3(0, -1, 0), out raycastHit))
+                + (new Vector3(point.x * newSizeX, chunk.meshObject.transform.position.y + 300 , point.y * newSizeY) - new Vector3(chunk.bounds.size.x / 2, 0, chunk.bounds.size.y / 2)) * fillPercent), new Vector3(0, -1, 0), out raycastHit))
             {
                 //Debug.DrawRay(new Vector3(chunk.chunkPosition.x + point.x, 200, chunk.chunkPosition.y + point.y), new Vector3(0, -1, 0));
 
@@ -255,11 +260,11 @@ public class ObjectCreator : MonoBehaviour
                 if (raycastHit.transform.name == chunk.meshObject.name)
                 {
                     TreeTypes treeTypeToSpawn = TreeTypes.Low;
-                    if (raycastHit.point.y < treeLowHeight)
+                    if (raycastHit.point.y < terrainGen.heightMapSettings.maxHeight * treeLowHeight)
                     {
                         treeTypeToSpawn = TreeTypes.Low;
                     }
-                    else if (raycastHit.point.y < treeMidHeight)
+                    else if (raycastHit.point.y < terrainGen.heightMapSettings.maxHeight * treeMidHeight)
                     {
                         treeTypeToSpawn = TreeTypes.Mid;
                     }
@@ -311,11 +316,11 @@ public class ObjectCreator : MonoBehaviour
             Transform treeTrans = chunkTransform.GetChild(i);
             TreeTypes treeTypeToSpawn = TreeTypes.Low;
 
-            if (treeTrans.position.y < treeLowHeight)
+            if (treeTrans.position.y < terrainGen.heightMapSettings.maxHeight * treeLowHeight)
             {
                 treeTypeToSpawn = TreeTypes.Low;
             }
-            else if (treeTrans.position.y < treeMidHeight)
+            else if (treeTrans.position.y < terrainGen.heightMapSettings.maxHeight * treeMidHeight)
             {
                 treeTypeToSpawn = TreeTypes.Mid;
             }
