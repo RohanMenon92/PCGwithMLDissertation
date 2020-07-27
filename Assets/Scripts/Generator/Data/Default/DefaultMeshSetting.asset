@@ -17,3 +17,4 @@ MonoBehaviour:
   useFlatShading: 0
   chunkSizeIndex: 6
   flatShadedChunkSizeIndex: 2
+  waterLevel: 2

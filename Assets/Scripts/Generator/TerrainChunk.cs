@@ -81,7 +81,8 @@ public class TerrainChunk
         colliderGenrationThreshold = meshSettings.meshWorldSize;
 
         // Create plane
-        meshObject = new GameObject("TerrainChunk_" + coord.x + ":" + coord.y);
+        meshObject = new GameObject(GameConstants.TerrainChunkPrefix + coord.x + ":" + coord.y);
+        meshObject.tag = GameConstants.TerrainChunkTag;
         meshObject.transform.parent = parent;
         meshObject.transform.position = new Vector3(chunkPosition.x, 0, chunkPosition.y);
 
@@ -235,23 +236,48 @@ public class TerrainChunk
             {
                 meshCollider.sharedMesh = lodMeshes[colliderLODindex].mesh;
 
+                averageXNormal = 0f;
                 averageYNormal = 0f;
+                averageZNormal = 0f;
+                averageValidSlope = 0f;
+
+                int vertexIndex = 0;
+                int waterVertexes = 0;
+                Vector3[] vertices = meshCollider.sharedMesh.vertices;
+
                 // Calculate data for ML statistics
                 foreach (Vector3 meshNormal in meshCollider.sharedMesh.normals)
                 {
-                    averageYNormal += Math.Abs(meshNormal.y);
-                    averageXNormal += Math.Abs(meshNormal.x);
-                    averageZNormal += Math.Abs(meshNormal.z);
-                    // If slope is less than 45 degrees
-                    if(Vector3.Angle(meshNormal, Vector3.up) < 45)
+                    // Check if it is a water mesh, dont take into account if it is
+                    if(vertices[vertexIndex].y >= meshSettings.waterLevel)
                     {
-                        averageValidSlope += 1;
+                        // Add metrics to calculate
+                        averageYNormal += Math.Abs(meshNormal.y);
+                        averageXNormal += Math.Abs(meshNormal.x);
+                        averageZNormal += Math.Abs(meshNormal.z);
+                        // If slope is less than 45 degrees
+                        if (Vector3.Angle(meshNormal, Vector3.up) < 45)
+                        {
+                            averageValidSlope += 1;
+                        }
+                    } else
+                    {
+                        waterVertexes++;
                     }
+
+                    vertexIndex++;
                 }
-                averageYNormal = averageYNormal / meshCollider.sharedMesh.normals.Length;
-                averageXNormal = averageXNormal / meshCollider.sharedMesh.normals.Length;
-                averageZNormal = averageZNormal / meshCollider.sharedMesh.normals.Length;
-                averageValidSlope = averageValidSlope / meshCollider.sharedMesh.normals.Length;
+
+                int nonWaterVertexes = meshCollider.sharedMesh.normals.Length - waterVertexes;
+                //Debug.Log("Non water vertexes " + nonWaterVertexes + " total mesh Length:" + meshCollider.sharedMesh.normals.Length);
+
+                averageYNormal = averageYNormal / nonWaterVertexes;
+                averageXNormal = averageXNormal / nonWaterVertexes;
+                averageZNormal = averageZNormal / nonWaterVertexes;
+                averageValidSlope = averageValidSlope / nonWaterVertexes;
+
+                //Debug.Log("AverageX " + averageXNormal + " :: AverageY " + averageYNormal + " :: AverageZ " + averageZNormal + " :: Average Valid Slope " + averageValidSlope);
+
                 hasSetCollider = true;
                 OnCreatedCollider.Invoke(this);
             }

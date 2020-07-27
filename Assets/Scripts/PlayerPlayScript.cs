@@ -151,7 +151,7 @@ public class PlayerPlayScript : MonoBehaviour
             {
                 camera.transform.LookAt(hit.point);
 
-                if (hit.transform.name.Contains("TerrainChunk"))
+                if (hit.transform.tag == GameConstants.TerrainChunkTag)
                 {
                     MoveAgentTo(hit.point);
                 }

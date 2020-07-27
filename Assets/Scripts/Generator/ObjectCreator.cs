@@ -115,29 +115,25 @@ public class ObjectCreator : MonoBehaviour
             {
                 //Debug.DrawRay(new Vector3(chunk.chunkPosition.x + point.x, 200, chunk.chunkPosition.y + point.y), new Vector3(0, -1, 0));
 
-                // If it collides with a terrainChunk
+                // If it collides with the example terrain mesh
                 if (raycastHit.transform.name.Contains("ExampleMesh"))
                 {
                     GameObject spawnObjectPrefab = null;
 
-                    TreeTypes treeTypeToSpawn = TreeTypes.Low;
                     Material spawnMaterial = lowMaterial;
 
                     if (raycastHit.point.y < mapPreview.heightMapSettings.maxHeight * treeLowHeight)
                     {
-                        treeTypeToSpawn = TreeTypes.Low;
                         spawnObjectPrefab = lowTrees[UnityEngine.Random.Range(0, lowTrees.Count - 1)];
                         spawnMaterial = lowMaterial;
                     }
                     else if (raycastHit.point.y < mapPreview.heightMapSettings.maxHeight * treeMidHeight)
                     {
-                        treeTypeToSpawn = TreeTypes.Mid;
                         spawnObjectPrefab = midTrees[UnityEngine.Random.Range(0, midTrees.Count - 1)];
                         spawnMaterial = midMaterial;
                     }
                     else
                     {
-                        treeTypeToSpawn = TreeTypes.High;
                         spawnObjectPrefab = highTrees[UnityEngine.Random.Range(0, highTrees.Count - 1)];
                         spawnMaterial = highMaterial;
                     }
@@ -162,16 +158,19 @@ public class ObjectCreator : MonoBehaviour
             foreach (GameObject lowPrefab in lowTrees)
             {
                 GameObject newTree = Instantiate(lowPrefab, unusedLowTreesPool);
+                newTree.tag = GameConstants.TreeTag;
                 newTree.SetActive(false);
             }
             foreach (GameObject midPrefab in midTrees)
             {
                 GameObject newTree = Instantiate(midPrefab, unusedMidTreesPool);
+                newTree.tag = GameConstants.TreeTag;
                 newTree.SetActive(false);
             }
             foreach (GameObject highPrefab in highTrees)
             {
                 GameObject newTree = Instantiate(highPrefab, unusedHighTreesPool);
+                newTree.tag = GameConstants.TreeTag;
                 newTree.SetActive(false);
             }
         }
@@ -241,8 +240,6 @@ public class ObjectCreator : MonoBehaviour
             return;
         }
 
-        chunk.hasTrees = true;
-
         float newSizeX = chunk.bounds.size.x / regionSize.x;
         float newSizeY = chunk.bounds.size.y / regionSize.y;
 
@@ -257,7 +254,7 @@ public class ObjectCreator : MonoBehaviour
                 //Debug.DrawRay(new Vector3(chunk.chunkPosition.x + point.x, 200, chunk.chunkPosition.y + point.y), new Vector3(0, -1, 0));
 
                 // If it collides with a terrainChunk
-                if (raycastHit.transform.name == chunk.meshObject.name)
+                if (raycastHit.transform.tag == GameConstants.TerrainChunkTag)
                 {
                     TreeTypes treeTypeToSpawn = TreeTypes.Low;
                     if (raycastHit.point.y < terrainGen.heightMapSettings.maxHeight * treeLowHeight)
@@ -281,6 +278,8 @@ public class ObjectCreator : MonoBehaviour
                 }
             }
         }
+
+        chunk.hasTrees = true;
     }
 
     public List<Vector2> OnCreateNewTreesForChunk(TerrainChunk chunk)
@@ -290,14 +289,12 @@ public class ObjectCreator : MonoBehaviour
             return null;
         }
 
-        chunk.hasCreatedTrees = true;
-        //chunk.hasObjects = true;
-
         float newSizeX = chunk.bounds.size.x / regionSize.x;
         float newSizeY = chunk.bounds.size.y / regionSize.y;
 
         points = PoissonDiscSampling.GeneratePoints(radius, regionSize, rejectionSamples);
 
+        chunk.hasCreatedTrees = true;
         return points;
     }
 

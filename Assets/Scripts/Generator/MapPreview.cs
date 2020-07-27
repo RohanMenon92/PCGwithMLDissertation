@@ -13,6 +13,8 @@ public class MapPreview : MonoBehaviour
 
     public bool autoUpdate;
 
+    public GameObject waterObject;
+
     [Range(0, MeshSettings.numSupportedLODs - 1)]
     public int editorLevelOfDetail;
 
@@ -68,6 +70,10 @@ public class MapPreview : MonoBehaviour
 
     void OnValuesUpdated()
     {
+        if (waterObject == null)
+        {
+            waterObject = GameObject.FindWithTag(GameConstants.WaterTag);
+        }
         UnityEditor.EditorApplication.delayCall += () =>
         {
             // Redraw the map in editor if values are updated
@@ -119,6 +125,8 @@ public class MapPreview : MonoBehaviour
 
     public void DrawMapInEditor()
     {
+        waterObject.transform.position = new Vector3(0f, meshSettings.waterLevel, 0f);
+
         HeightMap heightMap = HeightMapGenerator.GenerateHeightMap(meshSettings.numVertsPerLine, meshSettings.numVertsPerLine, heightMapSettings, Vector2.zero);
 
         if (drawMode == DrawMode.NoiseMap)

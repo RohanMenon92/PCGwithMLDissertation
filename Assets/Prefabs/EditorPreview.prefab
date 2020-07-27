@@ -220,6 +220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   drawMode: 2
   autoUpdate: 1
+  waterObject: {fileID: 0}
   editorLevelOfDetail: 0
   meshSettings: {fileID: 11400000, guid: 8fdee135f1f7e7945bf315ed6d9dfe2e, type: 2}
   heightMapSettings: {fileID: 11400000, guid: 8d7b19f5a13a313458c6939769edf30e, type: 2}

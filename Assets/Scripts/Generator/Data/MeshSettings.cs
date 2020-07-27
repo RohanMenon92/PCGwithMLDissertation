@@ -37,6 +37,8 @@ public class MeshSettings : UpdatableData
     [Range(0, numSupportedFlatShadedChunkSizes - 1)]
     public int flatShadedChunkSizeIndex;
 
+    public float waterLevel = 2.0f;
+
     // Return different values for mapChunkSize when using flatShading
     // Size includes 2 extra vertices for calculating normals at the edge hence + 1 instead of - 1 like earlier
     // Size now includes extra buffer vertices for LOD map generation too, 2 on each side (+4)

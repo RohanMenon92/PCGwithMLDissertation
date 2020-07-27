@@ -33,6 +33,8 @@ public class TerrainGenerator : MonoBehaviour
     public int colliderLODindex;
     public LODInfo[] detailLevels;
 
+    public GameObject waterObject;
+
     public Transform viewer;
     public Material terrainMaterial;
 
@@ -56,6 +58,7 @@ public class TerrainGenerator : MonoBehaviour
     PlayerPlayScript playerPlayScript;
     ObjectCreator objectCreator;
     NavMeshSurface navMeshSurface;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -63,13 +66,15 @@ public class TerrainGenerator : MonoBehaviour
         totNormalX = 0;
         totNormalY = 0;
         totNormalZ = 0;
-        totValidSlope = 0;
-
+        totValidSlope = 0;        
         playerPlayScript = FindObjectOfType<PlayerPlayScript>();
         objectCreator = FindObjectOfType<ObjectCreator>();
         navMeshSurface = gameObject.AddComponent<NavMeshSurface>();
         navMeshSurface.collectObjects = CollectObjects.Children;
         navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+
+
+        waterObject.transform.position = new Vector3(0f, meshSettings.waterLevel, 0f);
 
         terrainScale = meshSettings.terrainScale;
 
