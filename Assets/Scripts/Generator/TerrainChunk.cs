@@ -321,9 +321,9 @@ public class TerrainChunk
 
     public void ClearAll()
     {
+        // Clear all data
         detailLevels = null;
-
-        foreach(LODMesh LODmesh in lodMeshes)
+        foreach (LODMesh LODmesh in lodMeshes)
         {
             LODmesh.Clear();
         }
@@ -331,6 +331,16 @@ public class TerrainChunk
 
         OnVisibilityChanged = null;
         OnCreatedCollider = null;
+
+        GameObject.Destroy(meshRenderer.material);
+        GameObject.Destroy(meshRenderer);
+
+        GameObject.Destroy(meshFilter.sharedMesh);
+        GameObject.Destroy(meshFilter);
+
+        GameObject.Destroy(meshCollider.sharedMesh);
+        GameObject.Destroy(meshCollider);
+        GameObject.Destroy(meshObject);
     }
 }
 
@@ -363,7 +373,10 @@ class LODMesh
 
     public void Clear()
     {
-        mesh.Clear();
+        if(mesh != null)
+        {
+            mesh.Clear();
+        }
         updateCallback = null;
     }
 }
