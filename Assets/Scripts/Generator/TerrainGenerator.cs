@@ -40,39 +40,59 @@ public class TerrainGenerator : MonoBehaviour
 
     [Header("Chunk Collider Statistics (For Machine Learning)")]
     // ML STUFF: Calculate statistics for generated chunk colliders, if they are below a certain threshold, abandon generation
-    public int chunkCollidersMade; //  chunks generated
-    public float totNormalX; // To calculate Average X Normal 
-    public float totNormalY; // To calculate Average Y Normal 
-    public float totNormalZ; // To calculate Average Z Normal 
-    public float totValidSlope; // To calculate Average valid slope
+    public int chunkCollidersMade = 0; //  chunks generated
+    public float totNormalX = 0; // To calculate Average X Normal 
+    public float totNormalY = 0; // To calculate Average Y Normal 
+    public float totNormalZ = 0; // To calculate Average Z Normal 
+    public float totValidSlope = 0; // To calculate Average valid slope
+    public float totWaterAmount = 0; // To calculate water amount
 
     Vector2 viewerPosition;
     Vector2 lastUpdateViewerPosition;
     int chunksVisibleInViewDst;
     float meshWorldSize;
 
-
     Dictionary<Vector2, TerrainChunk> terrainChunkDictionary = new Dictionary<Vector2, TerrainChunk>();
     List<TerrainChunk> visibleTerrainChunks = new List<TerrainChunk>();
 
+    GeneratorAgent genAgent;
     PlayerPlayScript playerPlayScript;
     ObjectCreator objectCreator;
     NavMeshSurface navMeshSurface;
 
+    public bool isGeneratorTrainer = false;
+    public bool trainerChunksGenerated = false;
+
     // Start is called before the first frame update
     void Start()
     {
+        playerPlayScript = FindObjectOfType<PlayerPlayScript>();
+        objectCreator = FindObjectOfType<ObjectCreator>();
+
+        genAgent = GetComponent<GeneratorAgent>();
+        if(genAgent == null)
+        {
+            navMeshSurface = gameObject.AddComponent<NavMeshSurface>();
+            navMeshSurface.collectObjects = CollectObjects.Children;
+            navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+        } else
+        {
+            isGeneratorTrainer = true;
+        }
+
+        InitTerrain();
+    }
+
+    void InitTerrain()
+    {
+        trainerChunksGenerated = false;
+
         chunkCollidersMade = 0;
         totNormalX = 0;
         totNormalY = 0;
         totNormalZ = 0;
-        totValidSlope = 0;        
-        playerPlayScript = FindObjectOfType<PlayerPlayScript>();
-        objectCreator = FindObjectOfType<ObjectCreator>();
-        navMeshSurface = gameObject.AddComponent<NavMeshSurface>();
-        navMeshSurface.collectObjects = CollectObjects.Children;
-        navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
-
+        totValidSlope = 0;
+        totWaterAmount = 0;
 
         waterObject.transform.position = new Vector3(0f, meshSettings.waterLevel, 0f);
 
@@ -144,7 +164,7 @@ public class TerrainGenerator : MonoBehaviour
                     }
                     else
                     {
-                        TerrainChunk newChunk = new TerrainChunk(viewedChunkCoord, heightMapSettings, meshSettings, detailLevels, colliderLODindex, transform, viewer, terrainMaterial, objectCreator);
+                        TerrainChunk newChunk = new TerrainChunk(viewedChunkCoord, heightMapSettings, meshSettings, detailLevels, colliderLODindex, transform, viewer, terrainMaterial, objectCreator, isGeneratorTrainer ? meshSettings.meshWorldSize * 2 : meshSettings.meshWorldSize);
                         // Add new terrain chunk and parent it to this transform
                         terrainChunkDictionary.Add(viewedChunkCoord, newChunk);
                         newChunk.OnVisibilityChanged += OnTerrainChunkVisibilityChanged;
@@ -160,20 +180,35 @@ public class TerrainGenerator : MonoBehaviour
 
     void OnCreateColliderForChunk(TerrainChunk chunk)
     {
-        if(!playerPlayScript.thirdPersonPlayer)
-        {
-            // Update the surface because colliders are created for volume modifiers now
-            navMeshSurface.BuildNavMesh();
-        }
-
         // TODO: Create a function that returns these values
         chunkCollidersMade++;
+
         totNormalX += chunk.averageXNormal;
         totNormalY += chunk.averageYNormal;
         totNormalZ += chunk.averageZNormal;
         totValidSlope += chunk.averageValidSlope;
+        totWaterAmount += chunk.averageWaterAmount;
 
-        chunk.CreateTrees();
+        if(isGeneratorTrainer && !genAgent.hasComputedReward)
+        {
+            if(chunkCollidersMade >= genAgent.minimumChunkColliders)
+            {
+                genAgent.ComputeRewards();
+                genAgent.RequestDecision();
+            }
+            trainerChunksGenerated = chunkCollidersMade >= genAgent.minimumChunkColliders;
+        }
+
+        if (!isGeneratorTrainer)
+        {
+            chunk.CreateTrees();
+        }
+
+        if (!playerPlayScript.thirdPersonPlayer && !isGeneratorTrainer)
+        {
+            // Update the surface because colliders are created for volume modifiers now
+            navMeshSurface.BuildNavMesh();
+        }
     }
 
     void OnTerrainChunkVisibilityChanged(TerrainChunk chunk, bool isVisible)
@@ -185,5 +220,31 @@ public class TerrainGenerator : MonoBehaviour
         {
             visibleTerrainChunks.Remove(chunk);
         }
+    }
+
+    public void ResetGenerator()
+    {
+        ThreadDataRequester.ClearDataQueue();
+
+        foreach(TerrainChunk chunk in terrainChunkDictionary.Values)
+        {
+            chunk.ClearAll();
+        }
+
+        terrainChunkDictionary.Clear();
+        visibleTerrainChunks.Clear();
+
+        // Delete Earlier Chunks
+        for (int i = transform.childCount - 1; i >= 0; i--)
+        {
+            Transform chunkTransform = transform.GetChild(i);
+            GameObject.Destroy(chunkTransform.gameObject);
+        }
+
+        //// Call garbage collector
+        System.GC.Collect();
+
+        // Init Terrain
+        InitTerrain();
     }
 }

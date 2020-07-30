@@ -20,13 +20,14 @@ public class TerrainChunk
     public bool hasCreatedTrees = false;
 
     // ML STUFF: Use this for noise generation analysis (TODO :: Should also check if the terrain generation is taking into account water vertices?)
-    // Average Y should be at least greater than 4.5 (For navigable terrain)
+    // Average Y should be at least greater than 4.5 (For navigable terrain) but less than 5.75, (too flat)
     // Average X and Z should be greater than 1.5 (otherwise terrain is too flat) but preferably less than 2.5 (otherwise terrain is not navigable)
     // Average valid slope should be at least half of the generated terrain for interesting navigable meshes
     public float averageYNormal;
     public float averageXNormal;
     public float averageZNormal;
     public float averageValidSlope;
+    public float averageWaterAmount;
 
     Vector2 sampleCenter;
 
@@ -60,7 +61,7 @@ public class TerrainChunk
         }
     }
 
-    public TerrainChunk(Vector2 coord, HeightMapSettings heightMapSettings, MeshSettings meshSettings, LODInfo[] detailLevels, int colliderLODindex, Transform parent, Transform viewer, Material meshMaterial, ObjectCreator objectCreator)
+    public TerrainChunk(Vector2 coord, HeightMapSettings heightMapSettings, MeshSettings meshSettings, LODInfo[] detailLevels, int colliderLODindex, Transform parent, Transform viewer, Material meshMaterial, ObjectCreator objectCreator, float collisionGenerationThreshold)
     {
         this.coord = coord;
         this.detailLevels = detailLevels;
@@ -78,7 +79,7 @@ public class TerrainChunk
         chunkPosition = coord * meshSettings.meshWorldSize;
         bounds = new Bounds(chunkPosition, Vector2.one * meshSettings.meshWorldSize);
 
-        colliderGenrationThreshold = meshSettings.meshWorldSize;
+        colliderGenrationThreshold = collisionGenerationThreshold;
 
         // Create plane
         meshObject = new GameObject(GameConstants.TerrainChunkPrefix + coord.x + ":" + coord.y);
@@ -242,7 +243,7 @@ public class TerrainChunk
                 averageValidSlope = 0f;
 
                 int vertexIndex = 0;
-                int waterVertexes = 0;
+                int waterVertices = 0;
                 Vector3[] vertices = meshCollider.sharedMesh.vertices;
 
                 // Calculate data for ML statistics
@@ -262,19 +263,32 @@ public class TerrainChunk
                         }
                     } else
                     {
-                        waterVertexes++;
+                        waterVertices++;
                     }
 
                     vertexIndex++;
                 }
 
-                int nonWaterVertexes = meshCollider.sharedMesh.normals.Length - waterVertexes;
+                int totalVertices = meshCollider.sharedMesh.normals.Length;
+                int nonWaterVertices = totalVertices - waterVertices;
                 //Debug.Log("Non water vertexes " + nonWaterVertexes + " total mesh Length:" + meshCollider.sharedMesh.normals.Length);
 
-                averageYNormal = averageYNormal / nonWaterVertexes;
-                averageXNormal = averageXNormal / nonWaterVertexes;
-                averageZNormal = averageZNormal / nonWaterVertexes;
-                averageValidSlope = averageValidSlope / nonWaterVertexes;
+                if(nonWaterVertices != 0)
+                {
+                    averageWaterAmount = (float)waterVertices / totalVertices;
+                    averageYNormal = averageYNormal / nonWaterVertices;
+                    averageXNormal = averageXNormal / nonWaterVertices;
+                    averageZNormal = averageZNormal / nonWaterVertices;
+                    averageValidSlope = averageValidSlope / nonWaterVertices;
+                } else
+                {
+                    averageWaterAmount = 1;
+                    averageYNormal = 0;
+                    averageXNormal = 0;
+                    averageZNormal = 0;
+                    averageValidSlope = 0;
+                }
+
 
                 //Debug.Log("AverageX " + averageXNormal + " :: AverageY " + averageYNormal + " :: AverageZ " + averageZNormal + " :: Average Valid Slope " + averageValidSlope);
 
@@ -304,6 +318,20 @@ public class TerrainChunk
     {
         return meshObject.activeSelf;
     }
+
+    public void ClearAll()
+    {
+        detailLevels = null;
+
+        foreach(LODMesh LODmesh in lodMeshes)
+        {
+            LODmesh.Clear();
+        }
+        lodMeshes = null;
+
+        OnVisibilityChanged = null;
+        OnCreatedCollider = null;
+    }
 }
 
 class LODMesh
@@ -321,7 +349,6 @@ class LODMesh
 
     void OnMeshDataReceived(object meshDataObject)
     {
-
         MeshData meshData = (MeshData)meshDataObject;
         mesh = meshData.CreateMesh();
         hasMesh = true;
@@ -332,5 +359,11 @@ class LODMesh
     {
         hasRequestedMesh = true;
         ThreadDataRequester.RequestData(() => MeshGenerator.GenerateTerrainMesh(heightMap.values, lod, meshSettings), OnMeshDataReceived);
+    }
+
+    public void Clear()
+    {
+        mesh.Clear();
+        updateCallback = null;
     }
 }

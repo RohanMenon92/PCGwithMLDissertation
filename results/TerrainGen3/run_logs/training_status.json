@@ -1,0 +1,29 @@
+{
+    "TerrainGenerator": {
+        "checkpoints": [
+            {
+                "steps": 113,
+                "file_path": "results\\TerrainGen3\\TerrainGenerator\\TerrainGenerator-113.nn",
+                "reward": -333.7375030517578,
+                "creation_time": 1596108186.4203913
+            },
+            {
+                "steps": 210,
+                "file_path": "results\\TerrainGen3\\TerrainGenerator\\TerrainGenerator-210.nn",
+                "reward": -313.6500004359654,
+                "creation_time": 1596109947.8817425
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 210,
+            "file_path": "results\\TerrainGen3\\TerrainGenerator.nn",
+            "reward": -313.6500004359654,
+            "creation_time": 1596109947.8817425
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.1.0",
+        "mlagents_version": "0.19.0.dev0",
+        "tensorflow_version": "2.2.0"
+    }
+}

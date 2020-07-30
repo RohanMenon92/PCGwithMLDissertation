@@ -19,6 +19,7 @@ public static class Noise
         float maxPossibleHeight = 0;
 
         System.Random prng = new System.Random(settings.seed);
+
         // This is generated from seed so that we sample diffferent points from different positions,
         // Should remain constant for ML agent generators for proper learning
         Vector2[] octaveOffsets = new Vector2[settings.octaves];
@@ -134,7 +135,7 @@ public class NoiseSettings
     public int octaves = 6;
     [Range(0, 1)]
     public float persistence = 0.5f;
-    [Min(1)]
+    [Range(1, 5)]
     public float lacunarity = 1.5f;
     public int seed;
     public Vector2 offset;

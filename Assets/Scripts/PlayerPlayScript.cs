@@ -31,6 +31,7 @@ public class PlayerPlayScript : MonoBehaviour
 
     Camera camera;
     NavMeshAgent navMeshAgent;
+    TerrainGenerator terrainGen;
     WaypointType lastPath;
 
     List<GameObject> pathObjects = new List<GameObject>();
@@ -40,6 +41,7 @@ public class PlayerPlayScript : MonoBehaviour
     {
         camera = FindObjectOfType<Camera>();
         navMeshAgent = this.GetComponent<NavMeshAgent>();
+        terrainGen = FindObjectOfType<TerrainGenerator>();
 
         for (int i = 0; i <= waypointPoolSize; i++)
         {
@@ -51,8 +53,8 @@ public class PlayerPlayScript : MonoBehaviour
 
         // Set Which kind of control is enabled
         navMeshAgent.enabled = !thirdPersonPlayer;
-        this.GetComponent<vThirdPersonInput>().enabled = thirdPersonPlayer;
-        this.GetComponent<Rigidbody>().useGravity = thirdPersonPlayer;
+        this.GetComponent<vThirdPersonInput>().enabled = thirdPersonPlayer && !terrainGen.isGeneratorTrainer;
+        this.GetComponent<Rigidbody>().useGravity = thirdPersonPlayer && !terrainGen.isGeneratorTrainer;
 
         aimTarget.gameObject.SetActive(!thirdPersonPlayer);
         aimAgent.gameObject.SetActive(!thirdPersonPlayer);
@@ -151,7 +153,7 @@ public class PlayerPlayScript : MonoBehaviour
             {
                 camera.transform.LookAt(hit.point);
 
-                if (hit.transform.tag == GameConstants.TerrainChunkTag)
+                if (hit.transform.CompareTag(GameConstants.TerrainChunkTag))
                 {
                     MoveAgentTo(hit.point);
                 }

@@ -254,7 +254,7 @@ public class ObjectCreator : MonoBehaviour
                 //Debug.DrawRay(new Vector3(chunk.chunkPosition.x + point.x, 200, chunk.chunkPosition.y + point.y), new Vector3(0, -1, 0));
 
                 // If it collides with a terrainChunk
-                if (raycastHit.transform.tag == GameConstants.TerrainChunkTag)
+                if (raycastHit.transform.CompareTag(GameConstants.TerrainChunkTag))
                 {
                     TreeTypes treeTypeToSpawn = TreeTypes.Low;
                     if (raycastHit.point.y < terrainGen.heightMapSettings.maxHeight * treeLowHeight)

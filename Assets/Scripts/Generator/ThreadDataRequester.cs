@@ -82,4 +82,9 @@ public class ThreadDataRequester : MonoBehaviour
             threadDataQueue.Enqueue(new ThreadInfo(callback, data));
         }
     }
+
+    public static void ClearDataQueue()
+    {
+        instance.threadDataQueue.Clear();
+    }
 }
