@@ -1,0 +1,2 @@
+model_checkpoint_path: "TerrainGenerator-33994.ckpt"
+all_model_checkpoint_paths: "TerrainGenerator-33994.ckpt"

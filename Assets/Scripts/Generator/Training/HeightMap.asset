@@ -146,10 +146,10 @@ MonoBehaviour:
     m_RotationOrder: 4
   noiseSettings:
     normalizeMode: 1
-    noiseEstimatorVariable: 1.75
-    scale: 110
-    octaves: 7
-    persistence: 0.55
-    lacunarity: 3
+    noiseEstimatorVariable: 1.0378315
+    scale: 43.323353
+    octaves: 6
+    persistence: 0.77284646
+    lacunarity: 2.5734231
     seed: 0
-    offset: {x: 8.240914, y: 37.673645}
+    offset: {x: 0, y: 0}

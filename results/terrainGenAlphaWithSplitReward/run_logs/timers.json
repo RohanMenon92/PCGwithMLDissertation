@@ -1,0 +1,46 @@
+{
+    "name": "root",
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1596320175",
+        "python_version": "3.7.7 (default, May  6 2020, 11:45:54) [MSC v.1916 64 bit (AMD64)]",
+        "command_line_arguments": "C:\\Users\\aquar\\anaconda3\\envs\\ml-agents\\Scripts\\mlagents-learn terrainGen.yaml --run-id=terrainGenAlphaWithSplitReward --resume",
+        "mlagents_version": "0.19.0.dev0",
+        "mlagents_envs_version": "0.19.0.dev0",
+        "communication_protocol_version": "1.0.0",
+        "tensorflow_version": "2.2.0",
+        "end_time_seconds": "1596320232"
+    },
+    "total": 56.446017499999996,
+    "count": 1,
+    "self": 1.1705141999999995,
+    "children": {
+        "run_training.setup": {
+            "total": 0.7779182999999996,
+            "count": 1,
+            "self": 0.7779182999999996
+        },
+        "TrainerController.start_learning": {
+            "total": 54.497585,
+            "count": 1,
+            "self": 0.029555200000004334,
+            "children": {
+                "TrainerController._reset_env": {
+                    "total": 54.4677363,
+                    "count": 1,
+                    "self": 54.4677363
+                },
+                "trainer_threads": {
+                    "total": 5.200000003924288e-06,
+                    "count": 1,
+                    "self": 5.200000003924288e-06
+                },
+                "TrainerController._save_models": {
+                    "total": 0.0002882999999940239,
+                    "count": 1,
+                    "self": 0.0002882999999940239
+                }
+            }
+        }
+    }
+}
