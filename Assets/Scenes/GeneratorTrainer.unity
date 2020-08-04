@@ -526,7 +526,8 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 1000
+  MaxStep: 1500
+  trainValueDiv: 10
   minimumChunkColliders: 9
   minXNormal: 1.5
   maxXNormal: 2.5
@@ -534,10 +535,10 @@ MonoBehaviour:
   maxYNormal: 5.75
   minZNormal: 1.5
   maxZNormal: 2.5
-  minValidSlopePercent: 0.85
-  maxValidSlopePercent: 0.95
+  minValidSlopePercent: 0.8
+  maxValidSlopePercent: 0.9
   minWaterAmount: 0.05
-  maxWaterAmount: 0.1
+  maxWaterAmount: 0.25
   isTraining: 1
   hasComputedReward: 0
 --- !u!114 &2008967906
@@ -553,9 +554,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 14
-    NumStackedVectorObservations: 1
-    VectorActionSize: 09000000
+    VectorObservationSize: 23
+    NumStackedVectorObservations: 3
+    VectorActionSize: 08000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
   m_Model: {fileID: 0}

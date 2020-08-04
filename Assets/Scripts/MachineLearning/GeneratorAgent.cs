@@ -35,9 +35,9 @@ public class GeneratorAgent : Agent
     float maxNoiseScale = 200f;
     int minNoiseOctaves = 4;
     int maxNoiseOctaves = 10;
-    float minPersistence = 0.2f;
+    float minPersistence = 0.4f;
     float maxPersistence = 0.9f;
-    float minLacunarity = 1f;
+    float minLacunarity = 2f;
     float maxLacunarity = 5f;
     int minSeed = -500;
     int maxSeed = 500;
@@ -108,6 +108,18 @@ public class GeneratorAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
+        // 9 value observations
+        sensor.AddObservation((maxHeightMultiplier - minHeightMultiplier) / 2);
+        sensor.AddObservation((maxNoiseEstimator - minNoiseEstimator) / 2);
+        sensor.AddObservation((maxNoiseScale - minNoiseScale) / 2);
+        sensor.AddObservation((maxNoiseOctaves - minNoiseOctaves) / 2);
+        sensor.AddObservation((maxPersistence - minPersistence) / 2);
+        sensor.AddObservation((maxLacunarity - minLacunarity) / 2);
+        sensor.AddObservation((maxSeed - minSeed) / 2);
+        sensor.AddObservation((maxNoiseOffset - minNoiseOffset) / 2);
+        sensor.AddObservation((maxWaterLevel - minWaterLevel) / 2);
+
+        // 9 settings observations
         sensor.AddObservation(terrainGen.trainerChunksGenerated);
 
         sensor.AddObservation(terrainGen.heightMapSettings.heightMultiplier);
@@ -119,6 +131,7 @@ public class GeneratorAgent : Agent
         sensor.AddObservation(terrainGen.heightMapSettings.noiseSettings.seed);
         sensor.AddObservation(terrainGen.meshSettings.waterLevel);
 
+        // 5 output observations
         if(terrainGen.chunkCollidersMade > 0)
         {
             sensor.AddObservation(terrainGen.totNormalX / terrainGen.chunkCollidersMade);
@@ -195,7 +208,11 @@ public class GeneratorAgent : Agent
 
         if(hasGoodWater && hasGotGoodSlope && hasGotViableNormals)
         {
-            AddReward(3000f);
+            // Add bonus reward based on persistence, lacunarity, divided by scale (Soother terrain will get less reward)
+            // Prevents generation of extremely smooth terrain, adds variablility to reward signal
+            float rewardMultiplier = (terrainGen.heightMapSettings.noiseSettings.persistence * terrainGen.heightMapSettings.noiseSettings.lacunarity) / (maxNoiseScale / terrainGen.heightMapSettings.noiseSettings.scale);
+            // Add Success reward (3000f)
+            AddReward(3000f * rewardMultiplier);
             EndEpisode();
         }
 
