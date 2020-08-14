@@ -51,7 +51,7 @@ public static class Noise
                 frequency = 1;
                 float noiseHeight = 0;
 
-                for (int i = 0; i < settings.octaves; i++)
+                for (int i = 0; i < octaveOffsets.Length; i++)
                 {
                     float sampleX = 0f, sampleY = 0f;
                     if(settings.normalizeMode == NormalizeMode.Global) {

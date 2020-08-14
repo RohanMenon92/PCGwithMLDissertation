@@ -189,14 +189,13 @@ public class TerrainGenerator : MonoBehaviour
         totValidSlope += chunk.averageValidSlope;
         totWaterAmount += chunk.averageWaterAmount;
 
-        if(isGeneratorTrainer && !genAgent.hasComputedReward)
+        if(isGeneratorTrainer)
         {
-            if(chunkCollidersMade >= genAgent.minimumChunkColliders)
+            trainerChunksGenerated = chunkCollidersMade >= genAgent.GetMinimumChunks();
+            if (trainerChunksGenerated)
             {
-                genAgent.ComputeRewards();
-                genAgent.RequestDecision();
+                genAgent.OnGenerationComplete();
             }
-            trainerChunksGenerated = chunkCollidersMade >= genAgent.minimumChunkColliders;
         }
 
         if (!isGeneratorTrainer)
@@ -222,11 +221,11 @@ public class TerrainGenerator : MonoBehaviour
         }
     }
 
-    public void ResetGenerator()
+    public void ClearGeneratedData()
     {
         ThreadDataRequester.ClearDataQueue();
 
-        foreach(TerrainChunk chunk in terrainChunkDictionary.Values)
+        foreach (TerrainChunk chunk in terrainChunkDictionary.Values)
         {
             chunk.ClearAll();
         }
@@ -243,7 +242,11 @@ public class TerrainGenerator : MonoBehaviour
 
         //// Call garbage collector
         System.GC.Collect();
+    }
 
+    public void ResetGenerator()
+    {
+        ClearGeneratedData();
         // Init Terrain
         InitTerrain();
     }

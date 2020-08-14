@@ -142,6 +142,11 @@ public class TerrainChunk
 
     void OnHeightMapReceived(object mapData)
     {
+        if(meshRenderer == null)
+        {
+            return;
+        }
+
         this.heightMap = (HeightMap)mapData;
         heightMapReceived = true;
 
@@ -321,16 +326,17 @@ public class TerrainChunk
 
     public void ClearAll()
     {
+        OnVisibilityChanged = null;
+        OnCreatedCollider = null;
+
         // Clear all data
-        detailLevels = null;
         foreach (LODMesh LODmesh in lodMeshes)
         {
             LODmesh.Clear();
         }
-        lodMeshes = null;
+        //lodMeshes = null;
+        //detailLevels = null;
 
-        OnVisibilityChanged = null;
-        OnCreatedCollider = null;
 
         GameObject.Destroy(meshRenderer.material);
         GameObject.Destroy(meshRenderer);
@@ -362,7 +368,10 @@ class LODMesh
         MeshData meshData = (MeshData)meshDataObject;
         mesh = meshData.CreateMesh();
         hasMesh = true;
-        updateCallback();
+        if(updateCallback != null)
+        {
+            updateCallback();
+        }
     }
 
     public void RequestMesh(HeightMap heightMap, MeshSettings meshSettings)

@@ -526,7 +526,7 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 1500
+  MaxStep: 20
   trainValueDiv: 10
   minimumChunkColliders: 9
   minXNormal: 1.5
@@ -535,12 +535,11 @@ MonoBehaviour:
   maxYNormal: 5.75
   minZNormal: 1.5
   maxZNormal: 2.5
-  minValidSlopePercent: 0.8
+  minValidSlopePercent: 0.75
   maxValidSlopePercent: 0.9
   minWaterAmount: 0.05
-  maxWaterAmount: 0.25
+  maxWaterAmount: 0.15
   isTraining: 1
-  hasComputedReward: 0
 --- !u!114 &2008967906
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -554,9 +553,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 23
+    VectorObservationSize: 26
     NumStackedVectorObservations: 3
-    VectorActionSize: 08000000
+    VectorActionSize: 0a000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
   m_Model: {fileID: 0}
@@ -927,7 +926,7 @@ PrefabInstance:
     - target: {fileID: 4043210144618775692, guid: 3e5522ff0be5a9a47b8e0f594a6ba5e1,
         type: 3}
       propertyPath: detailLevels.Array.data[1].visibleDstThreshold
-      value: 500
+      value: 400
       objectReference: {fileID: 0}
     - target: {fileID: 4043210144618775692, guid: 3e5522ff0be5a9a47b8e0f594a6ba5e1,
         type: 3}
@@ -936,14 +935,25 @@ PrefabInstance:
       objectReference: {fileID: 905045670}
     - target: {fileID: 4043210144618775692, guid: 3e5522ff0be5a9a47b8e0f594a6ba5e1,
         type: 3}
-      propertyPath: detailLevels.Array.data[0].visibleDstThreshold
-      value: 300
-      objectReference: {fileID: 0}
-    - target: {fileID: 4043210144618775692, guid: 3e5522ff0be5a9a47b8e0f594a6ba5e1,
-        type: 3}
       propertyPath: isGeneratorTrainer
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4043210144618775692, guid: 3e5522ff0be5a9a47b8e0f594a6ba5e1,
+        type: 3}
+      propertyPath: detailLevels.Array.data[1].lod
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4043210144618775692, guid: 3e5522ff0be5a9a47b8e0f594a6ba5e1,
+        type: 3}
+      propertyPath: detailLevels.Array.data[0].visibleDstThreshold
+      value: 400
+      objectReference: {fileID: 0}
+    - target: {fileID: 4043210144618775692, guid: 3e5522ff0be5a9a47b8e0f594a6ba5e1,
+        type: 3}
+      propertyPath: terrainMaterial
+      value: 
+      objectReference: {fileID: -8771166627424403242, guid: 4ba34ea3641f81240b9e4467a019a15b,
+        type: 3}
     - target: {fileID: 4043210144618775695, guid: 3e5522ff0be5a9a47b8e0f594a6ba5e1,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1557,7 +1567,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4425428723315849720}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 9000000, guid: 340f99b8334a14c4a8a01dce6e1e5348, type: 3}
   m_Controller: {fileID: 9100000, guid: cbd1db45c75e5b948a5befe9ecb80421, type: 2}
   m_CullingMode: 1

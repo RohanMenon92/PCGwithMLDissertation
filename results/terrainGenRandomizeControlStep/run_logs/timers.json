@@ -1,0 +1,103 @@
+{
+    "name": "root",
+    "metadata": {
+        "timer_format_version": "0.1.0",
+        "start_time_seconds": "1596964141",
+        "python_version": "3.7.7 (default, May  6 2020, 11:45:54) [MSC v.1916 64 bit (AMD64)]",
+        "command_line_arguments": "C:\\Users\\aquar\\anaconda3\\envs\\ml-agents\\Scripts\\mlagents-learn terrainGenSAC.yaml --run-id=terrainGenRandomizeControlStep --force",
+        "mlagents_version": "0.19.0.dev0",
+        "mlagents_envs_version": "0.19.0.dev0",
+        "communication_protocol_version": "1.0.0",
+        "tensorflow_version": "2.2.0",
+        "end_time_seconds": "1596964168"
+    },
+    "total": 27.4162848,
+    "count": 1,
+    "self": 0.019847399999996185,
+    "children": {
+        "run_training.setup": {
+            "total": 0.031750200000000284,
+            "count": 1,
+            "self": 0.031750200000000284
+        },
+        "TrainerController.start_learning": {
+            "total": 27.364687200000002,
+            "count": 1,
+            "self": 0.0033115000000023542,
+            "children": {
+                "TrainerController._reset_env": {
+                    "total": 23.5799263,
+                    "count": 1,
+                    "self": 23.5799263
+                },
+                "TrainerController.advance": {
+                    "total": 1.4615553000000006,
+                    "count": 1,
+                    "self": 2.459999999970819e-05,
+                    "children": {
+                        "env_step": {
+                            "total": 1.4615307000000008,
+                            "count": 1,
+                            "self": 1.3163608999999994,
+                            "children": {
+                                "SubprocessEnvManager._take_step": {
+                                    "total": 0.14516980000000146,
+                                    "count": 1,
+                                    "self": 4.7899999998435305e-05,
+                                    "children": {
+                                        "TFPolicy.evaluate": {
+                                            "total": 0.14512190000000302,
+                                            "count": 1,
+                                            "self": 0.14512190000000302
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "trainer_threads": {
+                    "total": 9.73000000001889e-05,
+                    "count": 1,
+                    "self": 9.73000000001889e-05,
+                    "children": {
+                        "thread_root": {
+                            "total": 0.0,
+                            "count": 0,
+                            "is_parallel": true,
+                            "self": 0.0,
+                            "children": {
+                                "trainer_advance": {
+                                    "total": 1.4512718000000895,
+                                    "count": 709,
+                                    "is_parallel": true,
+                                    "self": 0.021947000000064776,
+                                    "children": {
+                                        "process_trajectory": {
+                                            "total": 1.4293248000000247,
+                                            "count": 709,
+                                            "is_parallel": true,
+                                            "self": 1.4293248000000247
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "TrainerController._save_models": {
+                    "total": 2.319796799999999,
+                    "count": 1,
+                    "self": 0.45316959999999895,
+                    "children": {
+                        "RLTrainer._checkpoint": {
+                            "total": 1.8666272,
+                            "count": 1,
+                            "self": 1.8666272
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
