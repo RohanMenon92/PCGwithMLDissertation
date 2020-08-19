@@ -164,6 +164,12 @@ public class TerrainChunk
 
     public void UpdateTerrainChunk()
     {
+        if (lodMeshes == null)
+        {
+            // meshes are cleared
+            return;
+        }
+
         if (!heightMapReceived)
         {
             return;
@@ -179,7 +185,6 @@ public class TerrainChunk
         if (visible)
         {
             int lodIndex = 0;
-
             for (int i = 0; i < detailLevels.Length - 1; i++)
             {
                 // In the last case, chunk will not be visible
@@ -238,7 +243,7 @@ public class TerrainChunk
 
         if (sqrDistnceFromViewerEdge < colliderGenrationThreshold * colliderGenrationThreshold || sqrDistnceFromViewerEdge == 0)
         {
-            if (lodMeshes[colliderLODindex].hasMesh)
+            if (lodMeshes[colliderLODindex] != null && lodMeshes[colliderLODindex].hasMesh)
             {
                 meshCollider.sharedMesh = lodMeshes[colliderLODindex].mesh;
 
@@ -330,11 +335,11 @@ public class TerrainChunk
         OnCreatedCollider = null;
 
         // Clear all data
-        foreach (LODMesh LODmesh in lodMeshes)
+        for (int i = 0; i <lodMeshes.Length; i++)
         {
-            LODmesh.Clear();
+            lodMeshes[i].Clear();
         }
-        //lodMeshes = null;
+        lodMeshes = null;
         //detailLevels = null;
 
 
@@ -382,10 +387,10 @@ class LODMesh
 
     public void Clear()
     {
-        if(mesh != null)
+        updateCallback = null;
+        if (mesh != null)
         {
             mesh.Clear();
         }
-        updateCallback = null;
     }
 }

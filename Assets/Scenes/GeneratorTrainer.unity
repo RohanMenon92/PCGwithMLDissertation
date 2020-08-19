@@ -526,7 +526,7 @@ MonoBehaviour:
   agentParameters:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
-  MaxStep: 20
+  MaxStep: 50
   trainValueDiv: 10
   minimumChunkColliders: 9
   minXNormal: 1.5
@@ -554,7 +554,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BrainParameters:
     VectorObservationSize: 26
-    NumStackedVectorObservations: 3
+    NumStackedVectorObservations: 5
     VectorActionSize: 0a000000
     VectorActionDescriptions: []
     VectorActionSpaceType: 1

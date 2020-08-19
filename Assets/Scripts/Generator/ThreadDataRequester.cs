@@ -14,13 +14,18 @@ public class ThreadDataRequester : MonoBehaviour
     struct ThreadInfo
     {
         // readonly so that they can't be modified after creation
-        public readonly Action<object> callback;
+        public Action<object> callback;
         public readonly object parameter;
 
         public ThreadInfo(Action<object> callback, object parameter)
         {
             this.callback = callback;
             this.parameter = parameter;
+        }
+
+        public void Clear()
+        {
+            this.callback = null;
         }
     }
     private void Awake()
@@ -85,6 +90,10 @@ public class ThreadDataRequester : MonoBehaviour
 
     public static void ClearDataQueue()
     {
+        foreach(ThreadInfo info in instance.threadDataQueue)
+        {
+            info.Clear();
+        }
         instance.threadDataQueue.Clear();
     }
 }

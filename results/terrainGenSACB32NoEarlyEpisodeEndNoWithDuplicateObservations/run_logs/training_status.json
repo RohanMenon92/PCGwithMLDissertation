@@ -1,0 +1,50 @@
+{
+    "lessonID": {
+        "lesson_num": 1
+    },
+    "TerrainGenerator": {
+        "checkpoints": [
+            {
+                "steps": 10875,
+                "file_path": "results\\terrainGenSACB32NoEarlyEpisodeEndNoWithDuplicateObservations\\TerrainGenerator\\TerrainGenerator-10875.nn",
+                "reward": -716.768180847168,
+                "creation_time": 1597736068.4297454
+            },
+            {
+                "steps": 10995,
+                "file_path": "results\\terrainGenSACB32NoEarlyEpisodeEndNoWithDuplicateObservations\\TerrainGenerator\\TerrainGenerator-10995.nn",
+                "reward": null,
+                "creation_time": 1597737714.7822871
+            },
+            {
+                "steps": 11235,
+                "file_path": "results\\terrainGenSACB32NoEarlyEpisodeEndNoWithDuplicateObservations\\TerrainGenerator\\TerrainGenerator-11235.nn",
+                "reward": null,
+                "creation_time": 1597738325.3609443
+            },
+            {
+                "steps": 17160,
+                "file_path": "results\\terrainGenSACB32NoEarlyEpisodeEndNoWithDuplicateObservations\\TerrainGenerator\\TerrainGenerator-17160.nn",
+                "reward": null,
+                "creation_time": 1597748021.1629035
+            },
+            {
+                "steps": 32235,
+                "file_path": "results\\terrainGenSACB32NoEarlyEpisodeEndNoWithDuplicateObservations\\TerrainGenerator\\TerrainGenerator-32235.nn",
+                "reward": null,
+                "creation_time": 1597774681.5123901
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 32235,
+            "file_path": "results\\terrainGenSACB32NoEarlyEpisodeEndNoWithDuplicateObservations\\TerrainGenerator.nn",
+            "reward": null,
+            "creation_time": 1597774681.5123901
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.1.0",
+        "mlagents_version": "0.19.0.dev0",
+        "tensorflow_version": "2.2.0"
+    }
+}
