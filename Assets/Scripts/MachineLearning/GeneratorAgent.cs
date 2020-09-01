@@ -51,46 +51,57 @@ public class GeneratorAgent : Agent
     public override void Initialize()
     {
         terrainGen = FindObjectOfType<TerrainGenerator>();
+        if(isTraining) { 
+            HeightMapSettings newHeightSettings = (HeightMapSettings)ScriptableObject.CreateInstance(typeof(HeightMapSettings));
+            newHeightSettings.falloffCurve = terrainGen.heightMapSettings.falloffCurve;
+            newHeightSettings.heightCurve = terrainGen.heightMapSettings.heightCurve;
+            newHeightSettings.heightMultiplier = terrainGen.heightMapSettings.heightMultiplier;
+            newHeightSettings.noiseSettings = new NoiseSettings();
+            newHeightSettings.noiseSettings.lacunarity = terrainGen.heightMapSettings.noiseSettings.lacunarity;
+            newHeightSettings.noiseSettings.persistence = terrainGen.heightMapSettings.noiseSettings.persistence;
+            newHeightSettings.noiseSettings.normalizeMode = terrainGen.heightMapSettings.noiseSettings.normalizeMode;
+            newHeightSettings.noiseSettings.noiseEstimatorVariable = terrainGen.heightMapSettings.noiseSettings.noiseEstimatorVariable;
+            newHeightSettings.noiseSettings.octaves = terrainGen.heightMapSettings.noiseSettings.octaves;
+            newHeightSettings.noiseSettings.offset = terrainGen.heightMapSettings.noiseSettings.offset;
+            newHeightSettings.noiseSettings.scale = terrainGen.heightMapSettings.noiseSettings.scale;
+            newHeightSettings.noiseSettings.seed = terrainGen.heightMapSettings.noiseSettings.seed;
+            MeshSettings newMeshSettings = (MeshSettings)ScriptableObject.CreateInstance(typeof(MeshSettings));
+            newMeshSettings.chunkSizeIndex = terrainGen.meshSettings.chunkSizeIndex;
+            newMeshSettings.flatShadedChunkSizeIndex = terrainGen.meshSettings.flatShadedChunkSizeIndex;
+            newMeshSettings.terrainScale = terrainGen.meshSettings.terrainScale;
+            newMeshSettings.useFlatShading = terrainGen.meshSettings.useFlatShading;
+            newMeshSettings.waterLevel = terrainGen.meshSettings.waterLevel;
 
-        HeightMapSettings newHeightSettings = (HeightMapSettings)ScriptableObject.CreateInstance(typeof(HeightMapSettings));
-        newHeightSettings.falloffCurve = terrainGen.heightMapSettings.falloffCurve;
-        newHeightSettings.heightCurve = terrainGen.heightMapSettings.heightCurve;
-        newHeightSettings.heightMultiplier = terrainGen.heightMapSettings.heightMultiplier;
-        newHeightSettings.noiseSettings = new NoiseSettings();
-        newHeightSettings.noiseSettings.lacunarity = terrainGen.heightMapSettings.noiseSettings.lacunarity;
-        newHeightSettings.noiseSettings.persistence = terrainGen.heightMapSettings.noiseSettings.persistence;
-        newHeightSettings.noiseSettings.normalizeMode = terrainGen.heightMapSettings.noiseSettings.normalizeMode;
-        newHeightSettings.noiseSettings.noiseEstimatorVariable = terrainGen.heightMapSettings.noiseSettings.noiseEstimatorVariable;
-        newHeightSettings.noiseSettings.octaves = terrainGen.heightMapSettings.noiseSettings.octaves;
-        newHeightSettings.noiseSettings.offset = terrainGen.heightMapSettings.noiseSettings.offset;
-        newHeightSettings.noiseSettings.scale = terrainGen.heightMapSettings.noiseSettings.scale;
-        newHeightSettings.noiseSettings.seed = terrainGen.heightMapSettings.noiseSettings.seed;
-        MeshSettings newMeshSettings = (MeshSettings)ScriptableObject.CreateInstance(typeof(MeshSettings));
-        newMeshSettings.chunkSizeIndex = terrainGen.meshSettings.chunkSizeIndex;
-        newMeshSettings.flatShadedChunkSizeIndex = terrainGen.meshSettings.flatShadedChunkSizeIndex;
-        newMeshSettings.terrainScale = terrainGen.meshSettings.terrainScale;
-        newMeshSettings.useFlatShading = terrainGen.meshSettings.useFlatShading;
-        newMeshSettings.waterLevel = terrainGen.meshSettings.waterLevel;
+            AssetDatabase.DeleteAsset("Assets/Scripts/Generator/Training/HeightMap.asset");
+            AssetDatabase.DeleteAsset("Assets/Scripts/Generator/Training/MeshSettings.asset");
 
-        AssetDatabase.DeleteAsset("Assets/Scripts/Generator/Training/HeightMap.asset");
-        AssetDatabase.DeleteAsset("Assets/Scripts/Generator/Training/MeshSettings.asset");
+            AssetDatabase.CreateAsset(newHeightSettings, "Assets/Scripts/Generator/Training/HeightMap.asset");
+            AssetDatabase.CreateAsset(newMeshSettings, "Assets/Scripts/Generator/Training/MeshSettings.asset");
 
-        AssetDatabase.CreateAsset(newHeightSettings, "Assets/Scripts/Generator/Training/HeightMap.asset");
-        AssetDatabase.CreateAsset(newMeshSettings, "Assets/Scripts/Generator/Training/MeshSettings.asset");
-
-        terrainGen.meshSettings = newMeshSettings;
-        terrainGen.heightMapSettings = newHeightSettings;
-
-        m_ResetParams = Academy.Instance.EnvironmentParameters;
-
-        // If the agent is not training, Max Step is 0
-        if (!isTraining)
+            terrainGen.meshSettings = newMeshSettings;
+            terrainGen.heightMapSettings = newHeightSettings;
+        } else
         {
+            // If the agent is not training, Max Step is 0
             MaxStep = 0;
         }
+        m_ResetParams = Academy.Instance.EnvironmentParameters;
 
         Academy.Instance.AutomaticSteppingEnabled = false;
         UpdateRandomizedTerrainData();
+    }
+
+    void Update()
+    {
+        if(!isTraining)
+        {
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                Debug.Log("Taking step");
+                Academy.Instance.EnvironmentStep();
+
+            }
+        }
     }
 
     public void UpdateRandomizedTerrainData()
@@ -106,10 +117,10 @@ public class GeneratorAgent : Agent
         terrainGen.heightMapSettings.noiseSettings.octaves = Random.Range(minNoiseOctaves, maxNoiseOctaves);
         terrainGen.heightMapSettings.noiseSettings.persistence = Random.Range(minPersistence, maxPersistence);
         terrainGen.heightMapSettings.noiseSettings.lacunarity = Random.Range(minLacunarity, maxLacunarity);
-        terrainGen.heightMapSettings.noiseSettings.seed = Random.Range(minSeed, maxSeed);
         terrainGen.meshSettings.waterLevel = Random.Range(minWaterLevel, terrainGen.heightMapSettings.maxHeight / 2);
 
-        terrainGen.heightMapSettings.noiseSettings.offset = new Vector2(Random.Range(minNoiseOffset, maxNoiseOffset), Random.Range(minNoiseOffset, maxNoiseOffset));
+        //terrainGen.heightMapSettings.noiseSettings.seed = Random.Range(minSeed, maxSeed);
+        //terrainGen.heightMapSettings.noiseSettings.offset = new Vector2(Random.Range(minNoiseOffset, maxNoiseOffset), Random.Range(minNoiseOffset, maxNoiseOffset));
     }
 
     public override void OnEpisodeBegin()
@@ -132,9 +143,11 @@ public class GeneratorAgent : Agent
         sensor.AddObservation((terrainGen.heightMapSettings.noiseSettings.octaves - minNoiseOctaves) / (maxNoiseOctaves - minNoiseOctaves));
         sensor.AddObservation((terrainGen.heightMapSettings.noiseSettings.persistence - minPersistence) / (maxPersistence - minPersistence));
         sensor.AddObservation((terrainGen.heightMapSettings.noiseSettings.lacunarity - minLacunarity) / (maxLacunarity - minLacunarity));
-        sensor.AddObservation((terrainGen.heightMapSettings.noiseSettings.seed - minSeed) / (maxSeed - minSeed));
-        sensor.AddObservation((terrainGen.heightMapSettings.noiseSettings.offset.x - minNoiseOffset) / (maxNoiseOffset - minNoiseOffset));
-        sensor.AddObservation((terrainGen.heightMapSettings.noiseSettings.offset.y - minNoiseOffset) / (maxNoiseOffset - minNoiseOffset));
+        // comment out for  no seed/ offset
+        //sensor.AddObservation((terrainGen.heightMapSettings.noiseSettings.seed - minSeed) / (maxSeed - minSeed));
+        //sensor.AddObservation((terrainGen.heightMapSettings.noiseSettings.offset.x - minNoiseOffset) / (maxNoiseOffset - minNoiseOffset));
+        //sensor.AddObservation((terrainGen.heightMapSettings.noiseSettings.offset.y - minNoiseOffset) / (maxNoiseOffset - minNoiseOffset));
+
         sensor.AddObservation((terrainGen.meshSettings.waterLevel - minWaterLevel) / (maxWaterLevel - minWaterLevel));
 
         // 10 settings observations
@@ -145,8 +158,10 @@ public class GeneratorAgent : Agent
         sensor.AddObservation(terrainGen.heightMapSettings.noiseSettings.octaves);
         sensor.AddObservation(terrainGen.heightMapSettings.noiseSettings.persistence);
         sensor.AddObservation(terrainGen.heightMapSettings.noiseSettings.lacunarity);
-        sensor.AddObservation(terrainGen.heightMapSettings.noiseSettings.seed);
-        sensor.AddObservation(terrainGen.heightMapSettings.noiseSettings.offset);
+        // comment out for no seed/offset
+        //sensor.AddObservation(terrainGen.heightMapSettings.noiseSettings.seed);
+        //sensor.AddObservation(terrainGen.heightMapSettings.noiseSettings.offset);
+
         sensor.AddObservation(terrainGen.meshSettings.waterLevel);
 
         // 5 output observations
@@ -176,123 +191,228 @@ public class GeneratorAgent : Agent
         float avgValidSlope = (terrainGen.totValidSlope / terrainGen.chunkCollidersMade);
         float avgWaterAmount = (terrainGen.totWaterAmount / terrainGen.chunkCollidersMade);
 
-        bool hasGotViableNormals = avgXNormal > minXNormal && avgXNormal < maxXNormal && avgYNormal > minYNormal && avgYNormal < maxYNormal && avgZNormal > minZNormal && avgZNormal < maxZNormal;
-        bool hasGoodWater = avgWaterAmount > minWaterAmount && avgWaterAmount < maxWaterAmount;
-        bool hasGotGoodSlope = avgValidSlope > minValidSlopePercent && avgValidSlope < maxValidSlopePercent;
 
-        Debug.Log("Lesson:" + m_ResetParams.GetWithDefault("lessonID", 0f) + " Completed Episodes:" + this.CompletedEpisodes + " StepCount:" + this.StepCount + " Cumalative Reward:" + this.GetCumulativeReward());
+        // Curricula based on output parameters
+        float currMinXNormal = 0;
+        float currMaxXNormal = 0;
+        float currMinYNormal = 0;
+        float currMaxYNormal = 0;
+        float currMinZNormal = 0;
+        float currMaxZNormal = 0;
+        float currMinValidSlope = 0;
+        float currMaxValidSlope = 0;
+        float currMinWaterAmount = 0;
+        float currMaxWaterAmount = 0;
+
+        float lessonID = m_ResetParams.GetWithDefault("lessonID", -1f);
+
+        if (lessonID == -1) {
+            currMinXNormal = minXNormal;
+            currMaxXNormal = maxXNormal;
+
+            currMinYNormal = minYNormal;
+            currMaxYNormal = maxYNormal;
+
+            currMinZNormal = minZNormal;
+            currMaxZNormal = maxZNormal;
+
+            currMinValidSlope = minValidSlopePercent;
+            currMaxValidSlope = maxValidSlopePercent;
+
+            currMinWaterAmount = minWaterAmount;
+            currMaxWaterAmount = maxWaterAmount;
+        } else
+        {
+            currMinXNormal = minXNormal - (0.25f * (4 - lessonID));
+            currMaxXNormal = maxXNormal + (0.25f * (4 - lessonID));
+
+            currMinYNormal = minYNormal - (0.25f * (4 - lessonID));
+            currMaxYNormal = maxYNormal + (0.25f * (4 - lessonID));
+
+            currMinZNormal = minZNormal - (0.25f * (4 - lessonID));
+            currMaxZNormal = maxZNormal + (0.25f * (4 - lessonID));
+
+            currMinValidSlope = minValidSlopePercent - (0.5f * (4 - lessonID));
+            currMaxValidSlope = maxValidSlopePercent + (0.1f * (4 - lessonID));
+
+            currMinWaterAmount = minWaterAmount - (0.01f * (4 - lessonID));
+            currMaxWaterAmount = maxWaterAmount + (0.05f * (4 - lessonID));
+        }
+
+        bool hasGotViableNormals = avgXNormal > currMinXNormal && avgXNormal < currMaxXNormal && avgYNormal > currMinYNormal && avgYNormal < currMaxYNormal && avgZNormal > currMinZNormal && avgZNormal < currMaxZNormal;
+        bool hasGoodWater = avgWaterAmount > currMinWaterAmount && avgWaterAmount < currMaxWaterAmount;
+        bool hasGotGoodSlope = avgValidSlope > currMinValidSlope && avgValidSlope < currMaxValidSlope;
+
+        bool hasActualViableNormals = avgXNormal > minXNormal && avgXNormal < maxXNormal && avgYNormal > minYNormal && avgYNormal < maxXNormal && avgZNormal > minZNormal && avgZNormal < maxZNormal;
+        bool hasActualGoodWater = avgWaterAmount > minWaterAmount && avgWaterAmount < maxWaterAmount;
+        bool hasActualGoodSlope = avgValidSlope > minValidSlopePercent && avgValidSlope < maxValidSlopePercent;
+
+        if(lessonID == -1)
+        {
+            if(hasActualViableNormals && hasActualGoodWater && hasActualGoodSlope)
+            {
+                AddReward(0.1f);
+            }
+        } else
+        {
+            if (hasGotViableNormals && hasGotGoodSlope && hasGoodWater)
+            {
+                AddReward((hasActualViableNormals ? 1f : 0.5f) + (hasActualGoodSlope ? 1f : 0.5f) + (hasActualGoodWater ? 1f : 0.5f));
+                if(lessonID == 4)
+                {
+                    float rewardMultiplier = (terrainGen.heightMapSettings.noiseSettings.persistence * terrainGen.heightMapSettings.noiseSettings.lacunarity) / (maxNoiseScale / terrainGen.heightMapSettings.noiseSettings.scale);
+                    AddReward(2f * rewardMultiplier);
+                }
+            }
+            else
+            {
+                if (!hasGotViableNormals)
+                {
+                    AddReward(-0.25f * Mathf.Abs(avgYNormal - (minYNormal + maxYNormal) / 2));
+                    AddReward(-0.1f * Mathf.Abs(avgXNormal - (minXNormal + maxXNormal) / 2));
+                    AddReward(-0.1f * Mathf.Abs(avgZNormal - (minZNormal + maxZNormal) / 2));
+                }
+                if (!hasGoodWater)
+                {
+                    AddReward(-0.1f * Mathf.Abs(avgWaterAmount - (minWaterAmount + maxWaterAmount) / 2));
+                }
+                if (!hasGotGoodSlope)
+                {
+                    AddReward(-0.1f * Mathf.Abs(avgValidSlope - (minValidSlopePercent + maxValidSlopePercent) / 2));
+                }
+            }
+        }
+
+
+        // Task based reward caluclulation for curricula
+
+        //bool hasGotViableNormals = avgXNormal > minXNormal && avgXNormal < maxXNormal && avgYNormal > minYNormal && avgYNormal < maxYNormal && avgZNormal > minZNormal && avgZNormal < maxZNormal;
+        //bool hasGoodWater = avgWaterAmount > minWaterAmount && avgWaterAmount < maxWaterAmount;
+        //bool hasGotGoodSlope = avgValidSlope > minValidSlopePercent && avgValidSlope < maxValidSlopePercent;
 
         // Do not calculate rewards here unless valid values have been set
-        switch (m_ResetParams.GetWithDefault("lessonID", -1f))
-        {
-            case -1:
-                // Add a slight amount of reward for focusing on ideal values
-                {
-                if(hasGotViableNormals && hasGoodWater && hasGotGoodSlope)
-                    AddReward(10f);
-                }
-                break;
-            case 1:
-                if (hasGoodWater)
-                {
-                    AddReward(0.1f);
-                }
+        //switch (m_ResetParams.GetWithDefault("lessonID", -1f))
+        //{
+        //    case -1:
+        //        // Add a slight amount of reward for focusing on ideal values
+        //        {
+        //        if(hasGotViableNormals && hasGoodWater && hasGotGoodSlope)
+        //            AddReward(10f);
+        //        }
+        //        break;
+        //    case 1:
+        //        if (hasGoodWater)
+        //        {
+        //            AddReward(0.1f);
+        //        }
 
-                // Focus on only normals and water                
-                if (hasGotViableNormals)
-                {
-                    AddReward(50f);
-                    //EndEpisode();
-                } else
-                {
-                    // Negative reward multiplied by difference amount missed
-                    // Staggered adding of reward because learning environment defaults to flatenned terrain
-                    if (avgYNormal < minYNormal || avgYNormal > maxYNormal)
-                    {
-                        AddReward(-2f * Mathf.Abs(avgYNormal - (minYNormal + maxYNormal) / 2));
-                    }
-                    else
-                    {
-                        AddReward(1f);
-                    }
-                    if (avgXNormal < minXNormal || avgXNormal > maxXNormal)
-                    {
-                        AddReward(-1f * Mathf.Abs(avgXNormal - (minXNormal + maxXNormal) / 2));
-                    }
-                    else
-                    {
-                        AddReward(1f);
-                    }
-                    if (avgZNormal < minZNormal || avgYNormal > maxZNormal)
-                    {
-                        AddReward(-1f * Mathf.Abs(avgZNormal - (minZNormal + maxZNormal) / 2));
-                    }
-                    else
-                    {
-                        AddReward(1f);
-                    }
-                }
-                break;
-            case 2:
-                // Focus on only water
-                // Focusing on first making water good so that normals can be calculated better
-                // Adds way too much noise to learning and prevents normals calculation
-                // water should be focused on after
-                if (hasGotViableNormals)
-                {
-                    AddReward(0.1f);
-                }
+        //        // Focus on only normals and water                
+        //        if (hasGotViableNormals)
+        //        {
+        //            AddReward(50f);
+        //            //EndEpisode();
+        //        } else
+        //        {
+        //            // Negative reward multiplied by difference amount missed
+        //            // Staggered adding of reward because learning environment defaults to flatenned terrain
+        //            if (avgYNormal < minYNormal || avgYNormal > maxYNormal)
+        //            {
+        //                AddReward(-2f * Mathf.Abs(avgYNormal - (minYNormal + maxYNormal) / 2));
+        //            }
+        //            else
+        //            {
+        //                AddReward(1f);
+        //            }
+        //            if (avgXNormal < minXNormal || avgXNormal > maxXNormal)
+        //            {
+        //                AddReward(-1f * Mathf.Abs(avgXNormal - (minXNormal + maxXNormal) / 2));
+        //            }
+        //            else
+        //            {
+        //                AddReward(1f);
+        //            }
+        //            if (avgZNormal < minZNormal || avgYNormal > maxZNormal)
+        //            {
+        //                AddReward(-1f * Mathf.Abs(avgZNormal - (minZNormal + maxZNormal) / 2));
+        //            }
+        //            else
+        //            {
+        //                AddReward(1f);
+        //            }
+        //        }
+        //        break;
+        //    case 2:
+        //        // Focus on only water
+        //        // Focusing on first making water good so that normals can be calculated better
+        //        // Adds way too much noise to learning and prevents normals calculation
+        //        // water should be focused on after
+        //        if (hasGotViableNormals)
+        //        {
+        //            AddReward(0.1f);
+        //        }
 
-                if (hasGotViableNormals && hasGoodWater)
-                {
-                    AddReward(50f);
-                    //EndEpisode();
-                }
-                else
-                {
-                    AddReward(-1f * Mathf.Abs(avgWaterAmount - (minWaterAmount + maxWaterAmount) / 2));
-                    //EndEpisode();
-                }
-                break;
-            case 3:
-                // Focus mainly on slope
-                if (hasGotViableNormals)
-                {
-                    AddReward(0.15f);
-                }
+        //        if (hasGotViableNormals && hasGoodWater)
+        //        {
+        //            AddReward(50f);
+        //            //EndEpisode();
+        //        }
+        //        else
+        //        {
+        //            AddReward(-1f * Mathf.Abs(avgWaterAmount - (minWaterAmount + maxWaterAmount) / 2));
+        //            //EndEpisode();
+        //        }
+        //        break;
+        //    case 3:
+        //        // Focus mainly on slope
+        //        if (hasGotViableNormals)
+        //        {
+        //            AddReward(0.15f);
+        //        }
 
-                if (hasGoodWater)
-                {
-                    AddReward(0.1f);
-                }
+        //        if (hasGoodWater)
+        //        {
+        //            AddReward(0.1f);
+        //        }
 
-                if (hasGotViableNormals && hasGoodWater && hasGotGoodSlope)
-                {
-                    AddReward(50f);
-                    //EndEpisode();
-                }
-                else
-                {
-                    AddReward(-5f * Mathf.Abs(avgValidSlope - (minValidSlopePercent + maxValidSlopePercent) / 2));
-                    //EndEpisode();
-                }
-                break;
-            case 4:
-                // Focus on all criteria being met and in the soonest time possible
-                if (hasGoodWater && hasGotGoodSlope && hasGotViableNormals)
-                {
-                    // Add bonus reward based on persistence, lacunarity, divided by scale (Soother terrain will get less reward)
-                    // Prevents generation of extremely smooth terrain, adds variablility to reward signal
-                    float rewardMultiplier = (terrainGen.heightMapSettings.noiseSettings.persistence * terrainGen.heightMapSettings.noiseSettings.lacunarity) / (maxNoiseScale / terrainGen.heightMapSettings.noiseSettings.scale);
-                    // Add Success reward (3000f)
-                    SetReward(500f * rewardMultiplier);
-                    EndEpisode();
-                } else
-                {
-                    AddReward(-5f);
-                }
-                break;
-        }
+        //        if (hasGotViableNormals && hasGoodWater && hasGotGoodSlope)
+        //        {
+        //            AddReward(50f);
+        //            //EndEpisode();
+        //        }
+        //        else
+        //        {
+        //            AddReward(-5f * Mathf.Abs(avgValidSlope - (minValidSlopePercent + maxValidSlopePercent) / 2));
+        //            //EndEpisode();
+        //        }
+        //        break;
+        //    case 4:
+        //        // Focus on all criteria being met and in the soonest time possible
+        //        if (hasGoodWater && hasGotGoodSlope && hasGotViableNormals)
+        //        {
+        //            // Add bonus reward based on persistence, lacunarity, divided by scale (Soother terrain will get less reward)
+        //            // Prevents generation of extremely smooth terrain, adds variablility to reward signal
+        //            float rewardMultiplier = (terrainGen.heightMapSettings.noiseSettings.persistence * terrainGen.heightMapSettings.noiseSettings.lacunarity) / (maxNoiseScale / terrainGen.heightMapSettings.noiseSettings.scale);
+        //            // Add Success reward (3000f)
+        //            AddReward(50f * rewardMultiplier);
+        //            //EndEpisode();
+        //        } else
+        //        {
+        //            if (!hasGoodWater)
+        //            {
+        //                AddReward(-1f);
+        //            }
+        //            if (!hasGotGoodSlope)
+        //            {
+        //                AddReward(-2f);
+        //            }
+        //            if (!hasGotViableNormals)
+        //            {
+        //                AddReward(-2f);
+        //            }
+        //        }
+        //        break;
+        //}
+        Debug.Log("Lesson:" + m_ResetParams.GetWithDefault("lessonID", 0f) + " Completed Episodes:" + this.CompletedEpisodes + " StepCount:" + this.StepCount + " Cumalative Reward:" + this.GetCumulativeReward());
     }
 
     public override void OnActionReceived(float[] vectorAction)
@@ -331,11 +451,11 @@ public class GeneratorAgent : Agent
         {
             terrainGen.heightMapSettings.heightMultiplier += vectorAction[0] * divValue;
             // If first lesson, addReward for valid value
-            AddReward(isValidValuesLesson ? 2.5f : 0f);
+            AddReward(isValidValuesLesson ? 0.25f : 0f);
         } else
         {
             // If first lesson, addReward for invalid value
-            AddReward(isValidValuesLesson ? -10 : -1);
+            AddReward(isValidValuesLesson ? -1 : -0.5f);
         }
 
         divValue = (maxNoiseEstimator - minNoiseEstimator) / trainValueDiv;
@@ -345,12 +465,12 @@ public class GeneratorAgent : Agent
         {
             terrainGen.heightMapSettings.noiseSettings.noiseEstimatorVariable += vectorAction[1] * divValue;
             // If first lesson, addReward for valid value
-            AddReward(isValidValuesLesson ? 2.5f : 0f);
+            AddReward(isValidValuesLesson ? 0.25f : 0f);
         }
         else
         {
             // If first lesson, addReward for invalid value
-            AddReward(isValidValuesLesson ? -10 : -1);
+            AddReward(isValidValuesLesson ? -1 : -0.5f);
         }
 
         divValue = (maxNoiseScale - minNoiseScale) / trainValueDiv;
@@ -360,12 +480,12 @@ public class GeneratorAgent : Agent
         {
             terrainGen.heightMapSettings.noiseSettings.scale += vectorAction[2] * divValue;
             // If first lesson, addReward for valid value
-            AddReward(isValidValuesLesson ? 2.5f : 0f);
+            AddReward(isValidValuesLesson ? 0.25f : 0f);
         }
         else
         {
             // If first lesson, addReward for invalid value
-            AddReward(isValidValuesLesson ? -10 : -1);
+            AddReward(isValidValuesLesson ? -1 : -0.5f);
         }
 
         divValue = (maxNoiseOctaves - minNoiseOctaves) / trainValueDiv;
@@ -375,12 +495,12 @@ public class GeneratorAgent : Agent
         {
             terrainGen.heightMapSettings.noiseSettings.octaves += Mathf.CeilToInt(vectorAction[3] * divValue);
             // If first lesson, addReward for valid value
-            AddReward(isValidValuesLesson ? 2.5f : 0f);
+            AddReward(isValidValuesLesson ? 0.25f : 0f);
         }
         else
         {
             // If first lesson, addReward for invalid value
-            AddReward(isValidValuesLesson ? -10 : -1);
+            AddReward(isValidValuesLesson ? -1 : -0.5f);
         }
 
         divValue = (maxPersistence - minPersistence) / trainValueDiv;
@@ -390,12 +510,12 @@ public class GeneratorAgent : Agent
         {
             terrainGen.heightMapSettings.noiseSettings.persistence += vectorAction[4] * divValue;
             // If first lesson, addReward for valid value
-            AddReward(isValidValuesLesson ? 2.5f : 0f);
+            AddReward(isValidValuesLesson ? 0.25f : 0f);
         }
         else
         {
             // If first lesson, addReward for invalid value
-            AddReward(isValidValuesLesson ? -10 : -1);
+            AddReward(isValidValuesLesson ? -1 : -0.5f);
         }
 
         divValue = (maxLacunarity - minLacunarity) / trainValueDiv;
@@ -405,74 +525,76 @@ public class GeneratorAgent : Agent
         {
             terrainGen.heightMapSettings.noiseSettings.lacunarity += vectorAction[5] * divValue;
             // If first lesson, addReward for valid value
-            AddReward(isValidValuesLesson ? 2.5f : 0f);
+            AddReward(isValidValuesLesson ? 0.25f : 0f);
         }
         else
         {
             // If first lesson, addReward for invalid value
-            AddReward(isValidValuesLesson ? -10 : -1);
-        }
-
-        divValue = (maxSeed - minSeed) / trainValueDiv;
-        if (vectorAction[6] == 0 || (
-            (terrainGen.heightMapSettings.noiseSettings.seed - (Mathf.Abs(vectorAction[6]) * divValue) > minSeed || vectorAction[6] > 0) && 
-            (terrainGen.heightMapSettings.noiseSettings.seed + (Mathf.Abs(vectorAction[6]) * divValue) < maxSeed || vectorAction[6] < 0)))
-        {
-            terrainGen.heightMapSettings.noiseSettings.seed += Mathf.CeilToInt(vectorAction[6] * divValue);
-            // If first lesson, addReward for valid value
-            AddReward(isValidValuesLesson ? 2.5f : 0f);
-        }
-        else
-        {
-            // If first lesson, addReward for invalid value
-            AddReward(isValidValuesLesson ? -10 : -1);
+            AddReward(isValidValuesLesson ? -1 : -0.5f);
         }
 
         divValue = (maxWaterLevel - minWaterLevel) / trainValueDiv;
-        if (vectorAction[7] == 0 || (
-            (terrainGen.meshSettings.waterLevel - (Mathf.Abs(vectorAction[7]) * divValue) > minWaterLevel || vectorAction[7] > 0) && 
-            (terrainGen.meshSettings.waterLevel + (Mathf.Abs(vectorAction[7]) * divValue) < maxWaterLevel || vectorAction[7] < 0)))
+        if (vectorAction[6] == 0 || (
+            (terrainGen.meshSettings.waterLevel - (Mathf.Abs(vectorAction[6]) * divValue) > minWaterLevel || vectorAction[6] > 0) && 
+            (terrainGen.meshSettings.waterLevel + (Mathf.Abs(vectorAction[6]) * divValue) < maxWaterLevel || vectorAction[6] < 0)))
         {
-            terrainGen.meshSettings.waterLevel += vectorAction[7] * divValue;
+            terrainGen.meshSettings.waterLevel += vectorAction[6] * divValue;
             // If first lesson, addReward for valid value
-            AddReward(isValidValuesLesson ? 2.5f : 0f);
+            AddReward(isValidValuesLesson ? 0.25f : 0f);
         }
         else
         {
             // If first lesson, addReward for invalid value
-            AddReward(isValidValuesLesson ? -10 : -1);
+            AddReward(isValidValuesLesson ? -1 : -0.5f);
         }
 
-        Vector2 offsetVector = terrainGen.heightMapSettings.noiseSettings.offset;
-        divValue = (maxNoiseOffset - minNoiseOffset) / trainValueDiv;
-        if (vectorAction[8] == 0 || (
-            (terrainGen.heightMapSettings.noiseSettings.offset.x - (Mathf.Abs(vectorAction[8]) * divValue) > minNoiseOffset || vectorAction[8] > 0) && 
-            (terrainGen.heightMapSettings.noiseSettings.offset.x + (Mathf.Abs(vectorAction[8]) * divValue) < maxNoiseOffset || vectorAction[8] < 0)))
-        {
-            offsetVector.x += vectorAction[8] * divValue;
-            // If first lesson, addReward for valid value
-            AddReward(isValidValuesLesson ? 2.5f : 0f);
-        }
-        else
-        {
-            // If first lesson, addReward for invalid value
-            AddReward(isValidValuesLesson ? -10 : -1);
-        }
-        divValue =(maxNoiseOffset - minNoiseOffset) / trainValueDiv;
-        if (vectorAction[9] == 0 || (
-            (terrainGen.heightMapSettings.noiseSettings.offset.y - (Mathf.Abs(vectorAction[9]) * divValue) > minNoiseOffset || vectorAction[9] > 0) && 
-            (terrainGen.heightMapSettings.noiseSettings.offset.y + (Mathf.Abs(vectorAction[9]) * divValue) < maxNoiseOffset || vectorAction[9] < 0)))
-        {
-            offsetVector.y += vectorAction[9] * (maxNoiseOffset - minNoiseOffset) / trainValueDiv;
-            // If first lesson, addReward for valid value
-            AddReward(isValidValuesLesson ? 2.5f : 0f);
-        }
-        else
-        {
-            // If first lesson, addReward for invalid value
-            AddReward(isValidValuesLesson ? -10 : -1);
-        }
-        terrainGen.heightMapSettings.noiseSettings.offset = offsetVector;
+        // START comment out for noo seed/offset
+        //divValue = (maxSeed - minSeed) / trainValueDiv;
+        //if (vectorAction[7] == 0 || (
+        //    (terrainGen.heightMapSettings.noiseSettings.seed - (Mathf.Abs(vectorAction[7]) * divValue) > minSeed || vectorAction[7] > 0) &&
+        //    (terrainGen.heightMapSettings.noiseSettings.seed + (Mathf.Abs(vectorAction[7]) * divValue) < maxSeed || vectorAction[7] < 0)))
+        //{
+        //    terrainGen.heightMapSettings.noiseSettings.seed += Mathf.CeilToInt(vectorAction[7] * divValue);
+        //    // If first lesson, addReward for valid value
+        //    AddReward(isValidValuesLesson ? 0.25f : 0f);
+        //}
+        //else
+        //{
+        //    // If first lesson, addReward for invalid value
+        //    AddReward(isValidValuesLesson ? -1 : -0.5f);
+        //}
+
+        //Vector2 offsetVector = terrainGen.heightMapSettings.noiseSettings.offset;
+        //divValue = (maxNoiseOffset - minNoiseOffset) / trainValueDiv;
+        //if (vectorAction[8] == 0 || (
+        //    (terrainGen.heightMapSettings.noiseSettings.offset.x - (Mathf.Abs(vectorAction[8]) * divValue) > minNoiseOffset || vectorAction[8] > 0) &&
+        //    (terrainGen.heightMapSettings.noiseSettings.offset.x + (Mathf.Abs(vectorAction[8]) * divValue) < maxNoiseOffset || vectorAction[8] < 0)))
+        //{
+        //    offsetVector.x += vectorAction[8] * divValue;
+        //    // If first lesson, addReward for valid value
+        //    AddReward(isValidValuesLesson ? 0.25f : 0f);
+        //}
+        //else
+        //{
+        //    // If first lesson, addReward for invalid value
+        //    AddReward(isValidValuesLesson ? -1 : -0.5f);
+        //}
+        //divValue = (maxNoiseOffset - minNoiseOffset) / trainValueDiv;
+        //if (vectorAction[9] == 0 || (
+        //    (terrainGen.heightMapSettings.noiseSettings.offset.y - (Mathf.Abs(vectorAction[9]) * divValue) > minNoiseOffset || vectorAction[9] > 0) &&
+        //    (terrainGen.heightMapSettings.noiseSettings.offset.y + (Mathf.Abs(vectorAction[9]) * divValue) < maxNoiseOffset || vectorAction[9] < 0)))
+        //{
+        //    offsetVector.y += vectorAction[9] * (maxNoiseOffset - minNoiseOffset) / trainValueDiv;
+        //    // If first lesson, addReward for valid value
+        //    AddReward(isValidValuesLesson ? 0.25f : 0f);
+        //}
+        //else
+        //{
+        //    // If first lesson, addReward for invalid value
+        //    AddReward(isValidValuesLesson ? -1 : -0.5f);
+        //}
+        //terrainGen.heightMapSettings.noiseSettings.offset = offsetVector;
+        // END comment out for noo seed/offset
 
         terrainGen.ResetGenerator();
     }
@@ -480,7 +602,7 @@ public class GeneratorAgent : Agent
     public int GetMinimumChunks()
     {
         // return 1 for valid inputs and minimumchunkcolliders for the rest of the lessons
-        return m_ResetParams.GetWithDefault("lessonID", -1f) == -1 ? 3 : minimumChunkColliders;
+        return isTraining ? m_ResetParams.GetWithDefault("lessonID", -1f) == -1 ? 3 : minimumChunkColliders : 20;
     }
 
     public void OnGenerationComplete()

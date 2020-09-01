@@ -1,0 +1,50 @@
+{
+    "lessonID": {
+        "lesson_num": 1
+    },
+    "TerrainGenerator": {
+        "checkpoints": [
+            {
+                "steps": 4750,
+                "file_path": "results\\terrainGenPPOB32NoEarlyEndLongerSteps2\\TerrainGenerator\\TerrainGenerator-4750.nn",
+                "reward": 691.6666666666666,
+                "creation_time": 1598028488.9594479
+            },
+            {
+                "steps": 9950,
+                "file_path": "results\\terrainGenPPOB32NoEarlyEndLongerSteps2\\TerrainGenerator\\TerrainGenerator-9950.nn",
+                "reward": 536.9985992431641,
+                "creation_time": 1598042582.6068645
+            },
+            {
+                "steps": 11900,
+                "file_path": "results\\terrainGenPPOB32NoEarlyEndLongerSteps2\\TerrainGenerator\\TerrainGenerator-11900.nn",
+                "reward": -515.3975255629596,
+                "creation_time": 1598046158.510666
+            },
+            {
+                "steps": 19950,
+                "file_path": "results\\terrainGenPPOB32NoEarlyEndLongerSteps2\\TerrainGenerator\\TerrainGenerator-19950.nn",
+                "reward": -547.4882376534598,
+                "creation_time": 1598059375.3877504
+            },
+            {
+                "steps": 21450,
+                "file_path": "results\\terrainGenPPOB32NoEarlyEndLongerSteps2\\TerrainGenerator\\TerrainGenerator-21450.nn",
+                "reward": -605.9576416015625,
+                "creation_time": 1598062077.1238942
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 21450,
+            "file_path": "results\\terrainGenPPOB32NoEarlyEndLongerSteps2\\TerrainGenerator.nn",
+            "reward": -605.9576416015625,
+            "creation_time": 1598062077.1238942
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.1.0",
+        "mlagents_version": "0.19.0.dev0",
+        "tensorflow_version": "2.2.0"
+    }
+}

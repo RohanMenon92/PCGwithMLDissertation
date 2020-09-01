@@ -21,7 +21,7 @@ behaviors:
         gamma: 0.995
         strength: 1.0
       curiosity:
-        strength: 0.9
+        strength: 0.2
         gamma: 0.9
         encoding_size: 128
     keep_checkpoints: 5
@@ -32,21 +32,21 @@ behaviors:
 environment_parameters:
   lessonID:
     curriculum:
-      - name: ValidValues
-        completion_criteria:
-          measure: reward
-          behavior: TerrainGenerator
-          signal_smoothing: true
-          min_lesson_length: 100
-          threshold: 350
-        value: -1
+     # - name: ValidValues
+     #   completion_criteria:
+     #     measure: reward
+     #     behavior: TerrainGenerator
+     #     signal_smoothing: true
+     #     min_lesson_length: 50
+     #     threshold: 80
+     #   value: -1
       - name: GoodNormals
         completion_criteria:
           measure: reward
           behavior: TerrainGenerator
           signal_smoothing: true
           min_lesson_length: 50
-          threshold: 200
+          threshold: 50
         value: 1
       - name: GoodWater
         completion_criteria:
@@ -54,7 +54,7 @@ environment_parameters:
           behavior: TerrainGenerator
           signal_smoothing: true
           min_lesson_length: 50
-          threshold: 200
+          threshold: 60
         value: 2
       - name: Goodslope
         completion_criteria:
@@ -62,7 +62,7 @@ environment_parameters:
           behavior: TerrainGenerator
           signal_smoothing: true
           min_lesson_length: 50
-          threshold: 200
+          threshold: 65
         value: 3
       - name: RegularTraining
         value: 4

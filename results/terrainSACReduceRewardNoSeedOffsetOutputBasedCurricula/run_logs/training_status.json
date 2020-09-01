@@ -1,0 +1,32 @@
+{
+    "lessonID": {
+        "lesson_num": 1
+    },
+    "TerrainGenerator": {
+        "checkpoints": [
+            {
+                "steps": 25000,
+                "file_path": "results\\terrainSACReduceRewardNoSeedOffsetOutputBasedCurricula\\TerrainGenerator\\TerrainGenerator-25000.nn",
+                "reward": null,
+                "creation_time": 1598377962.9484637
+            },
+            {
+                "steps": 49100,
+                "file_path": "results\\terrainSACReduceRewardNoSeedOffsetOutputBasedCurricula\\TerrainGenerator\\TerrainGenerator-49100.nn",
+                "reward": null,
+                "creation_time": 1598433669.0309415
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 49100,
+            "file_path": "results\\terrainSACReduceRewardNoSeedOffsetOutputBasedCurricula\\TerrainGenerator.nn",
+            "reward": null,
+            "creation_time": 1598433669.0309415
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.1.0",
+        "mlagents_version": "0.19.0.dev0",
+        "tensorflow_version": "2.2.0"
+    }
+}

@@ -281,7 +281,6 @@ public class TerrainChunk
 
                 int totalVertices = meshCollider.sharedMesh.normals.Length;
                 int nonWaterVertices = totalVertices - waterVertices;
-                //Debug.Log("Non water vertexes " + nonWaterVertexes + " total mesh Length:" + meshCollider.sharedMesh.normals.Length);
 
                 if(nonWaterVertices != 0)
                 {
@@ -298,9 +297,6 @@ public class TerrainChunk
                     averageZNormal = 0;
                     averageValidSlope = 0;
                 }
-
-
-                //Debug.Log("AverageX " + averageXNormal + " :: AverageY " + averageYNormal + " :: AverageZ " + averageZNormal + " :: Average Valid Slope " + averageValidSlope);
 
                 hasSetCollider = true;
                 OnCreatedCollider.Invoke(this);

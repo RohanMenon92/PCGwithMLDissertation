@@ -1,6 +1,6 @@
 {
     "lessonID": {
-        "lesson_num": 1
+        "lesson_num": 4
     },
     "TerrainGenerator": {
         "checkpoints": [
@@ -21,13 +21,25 @@
                 "file_path": "results\\terrainGenSACB32NoEarlyEpisodeEndLongerSteps\\TerrainGenerator\\TerrainGenerator-26650.nn",
                 "reward": null,
                 "creation_time": 1597827691.9093106
+            },
+            {
+                "steps": 50600,
+                "file_path": "results\\terrainGenSACB32NoEarlyEpisodeEndLongerSteps\\TerrainGenerator\\TerrainGenerator-50600.nn",
+                "reward": null,
+                "creation_time": 1597879224.0587223
+            },
+            {
+                "steps": 52300,
+                "file_path": "results\\terrainGenSACB32NoEarlyEpisodeEndLongerSteps\\TerrainGenerator\\TerrainGenerator-52300.nn",
+                "reward": null,
+                "creation_time": 1597961210.945838
             }
         ],
         "final_checkpoint": {
-            "steps": 26650,
+            "steps": 52300,
             "file_path": "results\\terrainGenSACB32NoEarlyEpisodeEndLongerSteps\\TerrainGenerator.nn",
             "reward": null,
-            "creation_time": 1597827691.9093106
+            "creation_time": 1597961210.945838
         }
     },
     "metadata": {

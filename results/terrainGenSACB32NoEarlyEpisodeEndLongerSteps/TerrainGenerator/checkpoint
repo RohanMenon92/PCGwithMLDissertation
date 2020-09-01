@@ -1,2 +1,2 @@
-model_checkpoint_path: "TerrainGenerator-26650.ckpt"
-all_model_checkpoint_paths: "TerrainGenerator-26650.ckpt"
+model_checkpoint_path: "TerrainGenerator-52300.ckpt"
+all_model_checkpoint_paths: "TerrainGenerator-52300.ckpt"
